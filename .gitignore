@@ -1,3 +1,11 @@
+# Claude AI files
+CLAUDE.md
+.claude/
+JUA_SKILL.md
+JUA_KNOWLEDGE_BASE.txt
+PHASE1_PROMPT.md
+PHASES.md
+
 # Binaries
 *.exe
 *.exe~
