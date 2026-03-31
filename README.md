@@ -110,7 +110,7 @@ Visit [juaframework.dev](https://juaframework.dev) for full documentation.
 
 ## License
 
-MIT — Copyright (c) 2025 Katuramu, WastePay Tech (based on Grit by MUKE-coder)
+MIT — Copyright (c) 2025 Katuramu, WastePay Tech
 
 ---
 
