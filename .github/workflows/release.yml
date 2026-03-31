@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache: true
+
+      - name: Run tests
+        run: go test ./... -v -race
+
+      - name: Build release binaries
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          LDFLAGS="-s -w -X main.Version=${VERSION}"
+
+          GOOS=linux   GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-linux-amd64   ./cmd/jua
+          GOOS=linux   GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-linux-arm64   ./cmd/jua
+          GOOS=darwin  GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-darwin-amd64  ./cmd/jua
+          GOOS=darwin  GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-darwin-arm64  ./cmd/jua
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-windows-amd64.exe ./cmd/jua
+
+          # Create tarballs for unix, zip for windows
+          cd dist
+          tar czf jua-linux-amd64.tar.gz  jua-linux-amd64
+          tar czf jua-linux-arm64.tar.gz  jua-linux-arm64
+          tar czf jua-darwin-amd64.tar.gz jua-darwin-amd64
+          tar czf jua-darwin-arm64.tar.gz jua-darwin-arm64
+          zip jua-windows-amd64.zip jua-windows-amd64.exe
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/jua-linux-amd64.tar.gz
+            dist/jua-linux-arm64.tar.gz
+            dist/jua-darwin-amd64.tar.gz
+            dist/jua-darwin-arm64.tar.gz
+            dist/jua-windows-amd64.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

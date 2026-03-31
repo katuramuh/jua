@@ -1,0 +1,2376 @@
+package scaffold
+
+import (
+	"fmt"
+	"path/filepath"
+	"strings"
+)
+
+func writeAPIFiles(root string, opts Options) error {
+	apiRoot := opts.APIRoot(root)
+	module := opts.Module()
+
+	files := map[string]string{
+		filepath.Join(apiRoot, "go.mod"):                              apiGoMod(opts),
+		filepath.Join(apiRoot, ".gitignore"):                          apiGitignore(),
+		filepath.Join(apiRoot, "cmd", "server", "main.go"):           apiMainGo(opts),
+		filepath.Join(apiRoot, "internal", "config", "config.go"):    apiConfigGo(),
+		filepath.Join(apiRoot, "internal", "database", "database.go"): apiDatabaseGo(),
+		filepath.Join(apiRoot, "internal", "models", "user.go"):               apiUserModelGo(),
+		filepath.Join(apiRoot, "internal", "models", "upload.go"):             apiUploadModelGo(),
+		filepath.Join(apiRoot, "internal", "models", "ui_component.go"):       apiUIComponentModelGo(),
+		filepath.Join(apiRoot, "internal", "models", "seed_ui_components.go"):          apiUIComponentSeedGo(),
+		filepath.Join(apiRoot, "internal", "models", "seed_ui_components_extended.go"): apiUIComponentSeedExtendedGo(),
+		filepath.Join(apiRoot, "internal", "handlers", "ui_registry.go"):      apiUIRegistryHandlerGo(),
+		filepath.Join(apiRoot, "internal", "services", "auth.go"):    apiAuthServiceGo(),
+		filepath.Join(apiRoot, "internal", "handlers", "auth.go"):    apiAuthHandlerGo(),
+		filepath.Join(apiRoot, "internal", "handlers", "user.go"):    apiUserHandlerGo(),
+		filepath.Join(apiRoot, "internal", "middleware", "auth.go"):        apiAuthMiddlewareGo(),
+		filepath.Join(apiRoot, "internal", "middleware", "cors.go"):        apiCorsMiddlewareGo(),
+		filepath.Join(apiRoot, "internal", "middleware", "logger.go"):      apiLoggerMiddlewareGo(),
+		filepath.Join(apiRoot, "internal", "middleware", "maintenance.go"): apiMaintenanceMiddlewareGo(),
+		filepath.Join(apiRoot, "internal", "routes", "routes.go"):    apiRoutesGo(),
+		filepath.Join(apiRoot, ".air.toml"):                          airConfig(),
+		// Test files — give the generated API a working test suite out of the box
+		filepath.Join(apiRoot, "internal", "handlers", "auth_test.go"):  apiAuthTestGo(),
+		filepath.Join(apiRoot, "internal", "handlers", "user_test.go"):  apiUserTestGo(),
+		filepath.Join(apiRoot, "internal", "handlers", "bench_test.go"): apiBenchTestGo(),
+	}
+
+	for path, content := range files {
+		// Replace module placeholder
+		content = strings.ReplaceAll(content, "{{MODULE}}", module)
+		if err := writeFile(path, content); err != nil {
+			return fmt.Errorf("writing %s: %w", path, err)
+		}
+	}
+
+	return nil
+}
+
+func apiGoMod(opts Options) string {
+	return fmt.Sprintf(`module %s
+
+go 1.21
+
+require (
+	github.com/katuramuh/gin-docs v0.0.0-20260222113017-4d647cb4e7aa
+	github.com/katuramuh/gorm-studio v1.0.1
+	github.com/katuramuh/pulse v0.0.0-20260223005903-6f5d6e356231
+	github.com/aws/aws-sdk-go-v2 v1.25.0
+	github.com/aws/aws-sdk-go-v2/config v1.27.0
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.0
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.16.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.51.0
+	github.com/disintegration/imaging v1.6.2
+	github.com/gin-gonic/gin v1.10.0
+	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/gorilla/sessions v1.4.0
+	github.com/hibiken/asynq v0.24.1
+	github.com/markbates/goth v1.80.0
+	github.com/joho/godotenv v1.5.1
+	github.com/redis/go-redis/v9 v9.4.0
+	golang.org/x/crypto v0.23.0
+	github.com/katuramuh/sentinel v0.0.0-20260220061042-2d2324be6824
+	gorm.io/datatypes v1.2.7
+	gorm.io/driver/postgres v1.5.11
+	gorm.io/gorm v1.25.12
+)
+
+require (
+	github.com/stretchr/testify v1.9.0
+	github.com/glebarez/sqlite v1.11.0
+)
+`, opts.Module())
+}
+
+func apiGitignore() string {
+	return `# Binary
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+tmp/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+`
+}
+
+func airConfig() string {
+	return `root = "."
+tmp_dir = "tmp"
+
+[build]
+  bin = "./tmp/server"
+  cmd = "go build -o ./tmp/server ./cmd/server"
+  delay = 1000
+  exclude_dir = ["tmp", "vendor", "node_modules"]
+  exclude_regex = ["_test.go"]
+  include_ext = ["go", "toml", "yaml"]
+  kill_delay = "0s"
+  send_interrupt = false
+  stop_on_error = true
+
+[log]
+  time = false
+
+[color]
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+`
+}
+
+func apiMainGo(opts Options) string {
+	return `package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/gorilla/sessions"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/gothic"
+	gothGithub "github.com/markbates/goth/providers/github"
+	"github.com/markbates/goth/providers/google"
+
+	"` + "{{MODULE}}" + `/internal/ai"
+	"` + "{{MODULE}}" + `/internal/cache"
+	"` + "{{MODULE}}" + `/internal/config"
+	"` + "{{MODULE}}" + `/internal/cron"
+	"` + "{{MODULE}}" + `/internal/database"
+	"` + "{{MODULE}}" + `/internal/jobs"
+	"` + "{{MODULE}}" + `/internal/mail"
+	"` + "{{MODULE}}" + `/internal/routes"
+	"` + "{{MODULE}}" + `/internal/storage"
+)
+
+func main() {
+	// Load configuration
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	// Connect to database
+	db, err := database.Connect(cfg.DatabaseURL)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+
+	// ── Phase 4 Services ─────────────────────────────────────────
+
+	// Redis cache
+	var cacheService *cache.Cache
+	if cfg.RedisURL != "" {
+		c, err := cache.New(cfg.RedisURL)
+		if err != nil {
+			log.Printf("Warning: Redis unavailable: %v (caching disabled)", err)
+		} else {
+			cacheService = c
+			log.Println("Redis cache connected")
+		}
+	}
+
+	// File storage (S3-compatible)
+	var storageService *storage.Storage
+	if cfg.Storage.Endpoint != "" && cfg.Storage.AccessKey != "" {
+		s, err := storage.New(cfg.Storage)
+		if err != nil {
+			log.Printf("Warning: Storage unavailable: %v (uploads disabled)", err)
+		} else {
+			storageService = s
+			log.Println("File storage connected")
+		}
+	}
+
+	// Email (Resend)
+	var mailer *mail.Mailer
+	if cfg.ResendAPIKey != "" && cfg.ResendAPIKey != "re_your_api_key" {
+		mailer = mail.New(cfg.ResendAPIKey, cfg.MailFrom)
+		log.Println("Email service configured")
+	} else {
+		log.Println("Warning: Resend API key not set (emails disabled)")
+	}
+
+	// AI service (Vercel AI Gateway)
+	var aiService *ai.AI
+	if cfg.AIGatewayAPIKey != "" {
+		aiService = ai.New(cfg.AIGatewayAPIKey, cfg.AIGatewayModel, cfg.AIGatewayURL)
+		log.Printf("AI service configured via AI Gateway (%s)", cfg.AIGatewayModel)
+	}
+
+	// Background jobs (asynq)
+	var jobClient *jobs.Client
+	if cfg.RedisURL != "" {
+		jc, err := jobs.NewClient(cfg.RedisURL)
+		if err != nil {
+			log.Printf("Warning: Job queue unavailable: %v", err)
+		} else {
+			jobClient = jc
+			log.Println("Job queue connected")
+		}
+	}
+
+	// OAuth2 social login providers
+	gothic.Store = sessions.NewCookieStore([]byte(cfg.JWTSecret))
+	var oauthProviders []goth.Provider
+	if cfg.GoogleClientID != "" {
+		oauthProviders = append(oauthProviders, google.New(
+			cfg.GoogleClientID, cfg.GoogleClientSecret,
+			cfg.AppURL+"/api/auth/oauth/google/callback",
+		))
+		log.Println("Google OAuth2 configured")
+	}
+	if cfg.GithubClientID != "" {
+		oauthProviders = append(oauthProviders, gothGithub.New(
+			cfg.GithubClientID, cfg.GithubClientSecret,
+			cfg.AppURL+"/api/auth/oauth/github/callback",
+		))
+		log.Println("GitHub OAuth2 configured")
+	}
+	if len(oauthProviders) > 0 {
+		goth.UseProviders(oauthProviders...)
+	}
+
+	// Build services
+	svc := &routes.Services{
+		Cache:   cacheService,
+		Storage: storageService,
+		Mailer:  mailer,
+		AI:      aiService,
+		Jobs:    jobClient,
+	}
+
+	// Setup router
+	router := routes.Setup(db, cfg, svc)
+
+	// Start background worker
+	var workerStop func()
+	if cfg.RedisURL != "" {
+		stop, err := jobs.StartWorker(cfg.RedisURL, jobs.WorkerDeps{
+			DB:      db,
+			Mailer:  mailer,
+			Storage: storageService,
+			Cache:   cacheService,
+		})
+		if err != nil {
+			log.Printf("Warning: Background worker failed to start: %v", err)
+		} else {
+			workerStop = stop
+			log.Println("Background worker started")
+		}
+	}
+
+	// Start cron scheduler
+	var cronScheduler *cron.Scheduler
+	if cfg.RedisURL != "" {
+		cs, err := cron.New(cfg.RedisURL)
+		if err != nil {
+			log.Printf("Warning: Cron scheduler failed to start: %v", err)
+		} else {
+			cronScheduler = cs
+			if err := cs.Start(); err != nil {
+				log.Printf("Warning: Cron scheduler failed to start: %v", err)
+			} else {
+				log.Println("Cron scheduler started")
+			}
+		}
+	}
+
+	// Create server
+	srv := &http.Server{
+		Addr:         fmt.Sprintf(":%s", cfg.Port),
+		Handler:      router,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	// Start server in goroutine
+	go func() {
+		log.Printf("Server starting on port %s", cfg.Port)
+		log.Printf("GORM Studio available at http://localhost:%s/studio", cfg.Port)
+		log.Printf("API Documentation at http://localhost:%s/docs", cfg.Port)
+		if cfg.PulseEnabled {
+			log.Printf("Pulse dashboard at http://localhost:%s/pulse/ui/", cfg.Port)
+		}
+		if cfg.SentinelEnabled {
+			log.Printf("Sentinel dashboard at http://localhost:%s/sentinel/ui", cfg.Port)
+		}
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server failed: %v", err)
+		}
+	}()
+
+	// Graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("Shutting down server...")
+
+	// Stop cron scheduler
+	if cronScheduler != nil {
+		cronScheduler.Stop()
+	}
+
+	// Stop background worker
+	if workerStop != nil {
+		workerStop()
+	}
+
+	// Close job client
+	if jobClient != nil {
+		jobClient.Close()
+	}
+
+	// Close cache connection
+	if cacheService != nil {
+		cacheService.Close()
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server exited")
+}
+`
+}
+
+func apiConfigGo() string {
+	return `package config
+
+import (
+	"fmt"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/joho/godotenv"
+)
+
+// StorageConfig holds credentials for a single S3-compatible provider.
+type StorageConfig struct {
+	Endpoint  string
+	AccessKey string
+	SecretKey string
+	Bucket    string
+	Region    string
+	UseSSL    bool
+}
+
+// Config holds all application configuration.
+type Config struct {
+	AppName     string
+	AppEnv      string
+	Port        string
+	AppURL      string
+	DatabaseURL string
+
+	JWTSecret        string
+	JWTAccessExpiry  time.Duration
+	JWTRefreshExpiry time.Duration
+
+	RedisURL string
+
+	// Storage
+	StorageDriver string        // "minio", "r2", or "b2"
+	Storage       StorageConfig // Resolved config for the active driver
+
+	ResendAPIKey string
+	MailFrom     string
+
+	CORSOrigins []string
+
+	GORMStudioEnabled  bool
+	GORMStudioUsername string
+	GORMStudioPassword string
+
+	// AI (Vercel AI Gateway)
+	AIGatewayAPIKey string
+	AIGatewayModel  string
+	AIGatewayURL    string
+
+	// TOTP (Two-Factor Authentication)
+	TOTPIssuer string
+
+	// Security (Sentinel)
+	SentinelEnabled   bool
+	SentinelUsername   string
+	SentinelPassword  string
+	SentinelSecretKey string
+
+	// Observability (Pulse)
+	PulseEnabled   bool
+	PulseUsername   string
+	PulsePassword  string
+
+	// OAuth2 Social Login
+	GoogleClientID     string
+	GoogleClientSecret string
+	GithubClientID     string
+	GithubClientSecret string
+	OAuthFrontendURL   string // Where to redirect after OAuth callback
+}
+
+// Load reads configuration from environment variables.
+func Load() (*Config, error) {
+	// Load .env file (ignore error if not found — production uses real env vars)
+	_ = godotenv.Load()
+	_ = godotenv.Load("../../.env") // Load from project root when running from apps/api
+
+	storageDriver := getEnv("STORAGE_DRIVER", "minio")
+
+	cfg := &Config{
+		AppName:     getEnv("APP_NAME", "jua-app"),
+		AppEnv:      getEnv("APP_ENV", "development"),
+		Port:        getEnv("APP_PORT", "8080"),
+		AppURL:      getEnv("APP_URL", "http://localhost:8080"),
+		DatabaseURL: getEnv("DATABASE_URL", ""),
+		JWTSecret:   getEnv("JWT_SECRET", ""),
+		RedisURL:    getEnv("REDIS_URL", "redis://localhost:6379"),
+
+		StorageDriver: storageDriver,
+		Storage:       resolveStorage(storageDriver),
+
+		ResendAPIKey: getEnv("RESEND_API_KEY", ""),
+		MailFrom:     getEnv("MAIL_FROM", "noreply@localhost"),
+
+		CORSOrigins: strings.Split(getEnv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001"), ","),
+
+		GORMStudioEnabled:  getEnv("GORM_STUDIO_ENABLED", "true") == "true",
+		GORMStudioUsername: getEnv("GORM_STUDIO_USERNAME", "admin"),
+		GORMStudioPassword: getEnv("GORM_STUDIO_PASSWORD", "studio"),
+
+		AIGatewayAPIKey: getEnv("AI_GATEWAY_API_KEY", ""),
+		AIGatewayModel:  getEnv("AI_GATEWAY_MODEL", "anthropic/claude-sonnet-4-6"),
+		AIGatewayURL:    getEnv("AI_GATEWAY_URL", "https://ai-gateway.vercel.sh/v1"),
+
+		TOTPIssuer: getEnv("TOTP_ISSUER", getEnv("APP_NAME", "jua-app")),
+
+		SentinelEnabled:   getEnv("SENTINEL_ENABLED", "true") == "true",
+		SentinelUsername:   getEnv("SENTINEL_USERNAME", "admin"),
+		SentinelPassword:  getEnv("SENTINEL_PASSWORD", "sentinel"),
+		SentinelSecretKey: getEnv("SENTINEL_SECRET_KEY", "sentinel-secret-change-me"),
+
+		PulseEnabled:  getEnv("PULSE_ENABLED", "true") == "true",
+		PulseUsername: getEnv("PULSE_USERNAME", "admin"),
+		PulsePassword: getEnv("PULSE_PASSWORD", "pulse"),
+
+		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
+		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
+		GithubClientID:     getEnv("GITHUB_CLIENT_ID", ""),
+		GithubClientSecret: getEnv("GITHUB_CLIENT_SECRET", ""),
+		OAuthFrontendURL:   getEnv("OAUTH_FRONTEND_URL", "http://localhost:3001"),
+	}
+
+	if cfg.DatabaseURL == "" {
+		return nil, fmt.Errorf("DATABASE_URL is required")
+	}
+
+	if cfg.JWTSecret == "" {
+		return nil, fmt.Errorf("JWT_SECRET is required")
+	}
+
+	// Parse durations
+	accessExpiry, err := time.ParseDuration(getEnv("JWT_ACCESS_EXPIRY", "15m"))
+	if err != nil {
+		return nil, fmt.Errorf("invalid JWT_ACCESS_EXPIRY: %w", err)
+	}
+	cfg.JWTAccessExpiry = accessExpiry
+
+	refreshExpiry, err := time.ParseDuration(getEnv("JWT_REFRESH_EXPIRY", "168h"))
+	if err != nil {
+		return nil, fmt.Errorf("invalid JWT_REFRESH_EXPIRY: %w", err)
+	}
+	cfg.JWTRefreshExpiry = refreshExpiry
+
+	return cfg, nil
+}
+
+// IsDevelopment returns true if the app is running in development mode.
+func (c *Config) IsDevelopment() bool {
+	return c.AppEnv == "development"
+}
+
+// resolveStorage returns the StorageConfig for the active driver.
+func resolveStorage(driver string) StorageConfig {
+	switch driver {
+	case "r2":
+		return StorageConfig{
+			Endpoint:  getEnv("R2_ENDPOINT", ""),
+			AccessKey: getEnv("R2_ACCESS_KEY", ""),
+			SecretKey: getEnv("R2_SECRET_KEY", ""),
+			Bucket:    getEnv("R2_BUCKET", "uploads"),
+			Region:    getEnv("R2_REGION", "auto"),
+			UseSSL:    true,
+		}
+	case "b2":
+		return StorageConfig{
+			Endpoint:  getEnv("B2_ENDPOINT", ""),
+			AccessKey: getEnv("B2_ACCESS_KEY", ""),
+			SecretKey: getEnv("B2_SECRET_KEY", ""),
+			Bucket:    getEnv("B2_BUCKET", "uploads"),
+			Region:    getEnv("B2_REGION", "us-west-004"),
+			UseSSL:    true,
+		}
+	default: // minio
+		return StorageConfig{
+			Endpoint:  getEnv("MINIO_ENDPOINT", "http://localhost:9000"),
+			AccessKey: getEnv("MINIO_ACCESS_KEY", "minioadmin"),
+			SecretKey: getEnv("MINIO_SECRET_KEY", "minioadmin"),
+			Bucket:    getEnv("MINIO_BUCKET", "uploads"),
+			Region:    getEnv("MINIO_REGION", "us-east-1"),
+			UseSSL:    getEnv("MINIO_USE_SSL", "false") == "true",
+		}
+	}
+}
+
+func getEnv(key, fallback string) string {
+	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return fallback
+}
+`
+}
+
+func apiDatabaseGo() string {
+	return `package database
+
+import (
+	"fmt"
+	"log"
+	"time"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+)
+
+// Connect establishes a database connection using the provided DSN.
+func Connect(dsn string) (*gorm.DB, error) {
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,
+		PreferSimpleProtocol: true, // Avoids prepared statement issues with schema changes
+	}), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get underlying sql.DB: %w", err)
+	}
+
+	// Connection pool settings
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(30 * time.Minute)
+	sqlDB.SetConnMaxIdleTime(10 * time.Minute)
+
+	log.Println("Database connected successfully")
+	return db, nil
+}
+`
+}
+
+func apiUserModelGo() string {
+	return `package models
+
+import (
+	"fmt"
+	"log"
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+)
+
+// Role constants
+const (
+	RoleAdmin  = "ADMIN"
+	RoleEditor = "EDITOR"
+	RoleUser   = "USER"
+	// jua:roles
+)
+
+// User represents a user in the system.
+type User struct {
+	ID              uint           ` + "`" + `gorm:"primarykey" json:"id"` + "`" + `
+	FirstName       string         ` + "`" + `gorm:"size:255;not null" json:"first_name" binding:"required"` + "`" + `
+	LastName        string         ` + "`" + `gorm:"size:255;not null" json:"last_name" binding:"required"` + "`" + `
+	Email           string         ` + "`" + `gorm:"size:255;uniqueIndex;not null" json:"email" binding:"required,email"` + "`" + `
+	Password        string         ` + "`" + `gorm:"size:255" json:"-"` + "`" + `
+	Role            string         ` + "`" + `gorm:"size:20;default:USER" json:"role"` + "`" + `
+	Avatar          string         ` + "`" + `gorm:"size:500" json:"avatar"` + "`" + `
+	JobTitle        string         ` + "`" + `gorm:"size:255" json:"job_title"` + "`" + `
+	Bio             string         ` + "`" + `gorm:"type:text" json:"bio"` + "`" + `
+	Active          bool           ` + "`" + `gorm:"default:true" json:"active"` + "`" + `
+	Provider        string         ` + "`" + `gorm:"size:50;default:'local'" json:"provider"` + "`" + `
+	GoogleID        string         ` + "`" + `gorm:"size:255" json:"-"` + "`" + `
+	GithubID        string         ` + "`" + `gorm:"size:255" json:"-"` + "`" + `
+	EmailVerifiedAt *time.Time     ` + "`" + `json:"email_verified_at"` + "`" + `
+	IPAddress       string         ` + "`" + `gorm:"size:45" json:"ip_address"` + "`" + `
+	MACAddress      string         ` + "`" + `gorm:"size:50" json:"mac_address"` + "`" + `
+	CreatedAt       time.Time      ` + "`" + `json:"created_at"` + "`" + `
+	UpdatedAt       time.Time      ` + "`" + `json:"updated_at"` + "`" + `
+	DeletedAt       gorm.DeletedAt ` + "`" + `gorm:"index" json:"-"` + "`" + `
+}
+
+// BeforeCreate hashes the password before saving.
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+	if u.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+		u.Password = string(hashedPassword)
+	}
+	return nil
+}
+
+// CheckPassword compares the given password with the stored hash.
+func (u *User) CheckPassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	return err == nil
+}
+
+// Models returns the ordered list of all models for migration.
+// Models with no foreign key dependencies come first.
+func Models() []interface{} {
+	return []interface{}{
+		&User{},
+		&Upload{},
+		&Blog{},
+		&UIComponent{},
+		&TwoFactorConfig{},
+		&TrustedDevice{},
+		&TOTPPendingToken{},
+		// jua:models
+	}
+}
+
+// Migrate runs database migrations only for tables that don't exist yet.
+// It prints which tables were created and which were skipped.
+func Migrate(db *gorm.DB) error {
+	models := Models()
+	migrated := 0
+
+	for _, model := range models {
+		if db.Migrator().HasTable(model) {
+			log.Printf("  ✓ %T — already exists, skipping", model)
+			continue
+		}
+
+		if err := db.AutoMigrate(model); err != nil {
+			return fmt.Errorf("migrating %T: %w", model, err)
+		}
+		log.Printf("  ✓ %T — created", model)
+		migrated++
+	}
+
+	if migrated == 0 {
+		log.Println("All tables are up to date — nothing to migrate.")
+	} else {
+		log.Printf("Migrated %d table(s).", migrated)
+	}
+
+	return nil
+}
+`
+}
+
+func apiUploadModelGo() string {
+	return `package models
+
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
+// Upload represents a file uploaded to storage.
+type Upload struct {
+	ID           uint           ` + "`" + `gorm:"primarykey" json:"id"` + "`" + `
+	Filename     string         ` + "`" + `gorm:"size:255;not null" json:"filename"` + "`" + `
+	OriginalName string         ` + "`" + `gorm:"size:255;not null" json:"original_name"` + "`" + `
+	MimeType     string         ` + "`" + `gorm:"size:100;not null" json:"mime_type"` + "`" + `
+	Size         int64          ` + "`" + `gorm:"not null" json:"size"` + "`" + `
+	Path         string         ` + "`" + `gorm:"size:500;not null" json:"path"` + "`" + `
+	URL          string         ` + "`" + `gorm:"size:500" json:"url"` + "`" + `
+	ThumbnailURL string         ` + "`" + `gorm:"size:500" json:"thumbnail_url"` + "`" + `
+	UserID       uint           ` + "`" + `gorm:"index;not null" json:"user_id"` + "`" + `
+	User         User           ` + "`" + `gorm:"foreignKey:UserID" json:"-"` + "`" + `
+	CreatedAt    time.Time      ` + "`" + `json:"created_at"` + "`" + `
+	UpdatedAt    time.Time      ` + "`" + `json:"updated_at"` + "`" + `
+	DeletedAt    gorm.DeletedAt ` + "`" + `gorm:"index" json:"-"` + "`" + `
+}
+`
+}
+
+func apiAuthServiceGo() string {
+	return `package services
+
+import (
+	"crypto/rand"
+	"encoding/hex"
+	"fmt"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+)
+
+// AuthService handles JWT token operations.
+type AuthService struct {
+	Secret        string
+	AccessExpiry  time.Duration
+	RefreshExpiry time.Duration
+}
+
+// TokenPair holds access and refresh tokens.
+type TokenPair struct {
+	AccessToken  string ` + "`" + `json:"access_token"` + "`" + `
+	RefreshToken string ` + "`" + `json:"refresh_token"` + "`" + `
+	ExpiresAt    int64  ` + "`" + `json:"expires_at"` + "`" + `
+}
+
+// Claims represents JWT claims.
+type Claims struct {
+	UserID uint   ` + "`" + `json:"user_id"` + "`" + `
+	Email  string ` + "`" + `json:"email"` + "`" + `
+	Role   string ` + "`" + `json:"role"` + "`" + `
+	jwt.RegisteredClaims
+}
+
+// GenerateTokenPair creates a new access + refresh token pair.
+func (s *AuthService) GenerateTokenPair(userID uint, email, role string) (*TokenPair, error) {
+	accessToken, expiresAt, err := s.generateToken(userID, email, role, s.AccessExpiry)
+	if err != nil {
+		return nil, fmt.Errorf("generating access token: %w", err)
+	}
+
+	refreshToken, _, err := s.generateToken(userID, email, role, s.RefreshExpiry)
+	if err != nil {
+		return nil, fmt.Errorf("generating refresh token: %w", err)
+	}
+
+	return &TokenPair{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ExpiresAt:    expiresAt,
+	}, nil
+}
+
+// ValidateToken parses and validates a JWT token.
+func (s *AuthService) ValidateToken(tokenString string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(s.Secret), nil
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("parsing token: %w", err)
+	}
+
+	claims, ok := token.Claims.(*Claims)
+	if !ok || !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	return claims, nil
+}
+
+// GenerateResetToken creates a random hex token for password resets.
+func GenerateResetToken() (string, error) {
+	bytes := make([]byte, 32)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", fmt.Errorf("generating reset token: %w", err)
+	}
+	return hex.EncodeToString(bytes), nil
+}
+
+func (s *AuthService) generateToken(userID uint, email, role string, expiry time.Duration) (string, int64, error) {
+	expiresAt := time.Now().Add(expiry)
+
+	claims := &Claims{
+		UserID: userID,
+		Email:  email,
+		Role:   role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(s.Secret))
+	if err != nil {
+		return "", 0, err
+	}
+
+	return tokenString, expiresAt.Unix(), nil
+}
+`
+}
+
+func apiAuthHandlerGo() string {
+	return `package handlers
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"net/url"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/markbates/goth/gothic"
+	"gorm.io/gorm"
+
+	"golang.org/x/crypto/bcrypt"
+
+	"` + "{{MODULE}}" + `/internal/config"
+	"` + "{{MODULE}}" + `/internal/models"
+	"` + "{{MODULE}}" + `/internal/services"
+	"` + "{{MODULE}}" + `/internal/totp"
+)
+
+// AuthHandler handles authentication endpoints.
+type AuthHandler struct {
+	DB          *gorm.DB
+	AuthService *services.AuthService
+	Config      *config.Config
+}
+
+type registerRequest struct {
+	FirstName  string ` + "`" + `json:"first_name" binding:"required,min=2"` + "`" + `
+	LastName   string ` + "`" + `json:"last_name" binding:"required,min=2"` + "`" + `
+	Email      string ` + "`" + `json:"email" binding:"required,email"` + "`" + `
+	Password   string ` + "`" + `json:"password" binding:"required,min=8"` + "`" + `
+	MACAddress string ` + "`" + `json:"mac_address"` + "`" + ` // optional — provided by client if available
+}
+
+type loginRequest struct {
+	Email    string ` + "`" + `json:"email" binding:"required,email"` + "`" + `
+	Password string ` + "`" + `json:"password" binding:"required"` + "`" + `
+}
+
+type refreshRequest struct {
+	RefreshToken string ` + "`" + `json:"refresh_token" binding:"required"` + "`" + `
+}
+
+type forgotPasswordRequest struct {
+	Email string ` + "`" + `json:"email" binding:"required,email"` + "`" + `
+}
+
+type resetPasswordRequest struct {
+	Token    string ` + "`" + `json:"token" binding:"required"` + "`" + `
+	Password string ` + "`" + `json:"password" binding:"required,min=8"` + "`" + `
+}
+
+// Register creates a new user account.
+func (h *AuthHandler) Register(c *gin.Context) {
+	var req registerRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": gin.H{
+				"code":    "VALIDATION_ERROR",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	// Check email uniqueness
+	var existingUser models.User
+	if err := h.DB.Where("email = ?", req.Email).First(&existingUser).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"error": gin.H{
+				"code":    "EMAIL_EXISTS",
+				"message": "A user with this email already exists",
+			},
+		})
+		return
+	}
+
+	user := models.User{
+		FirstName:  req.FirstName,
+		LastName:   req.LastName,
+		Email:      req.Email,
+		Password:   req.Password,
+		Role:       models.RoleUser,
+		Active:     true,
+		IPAddress:  c.ClientIP(),
+		MACAddress: req.MACAddress,
+	}
+
+	if err := h.DB.Create(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Failed to create user",
+			},
+		})
+		return
+	}
+
+	tokens, err := h.AuthService.GenerateTokenPair(user.ID, user.Email, user.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "TOKEN_ERROR",
+				"message": "Failed to generate tokens",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"data": gin.H{
+			"user":   user,
+			"tokens": tokens,
+		},
+		"message": "User registered successfully",
+	})
+}
+
+// Login authenticates a user and returns tokens.
+func (h *AuthHandler) Login(c *gin.Context) {
+	var req loginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": gin.H{
+				"code":    "VALIDATION_ERROR",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	var user models.User
+	if err := h.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": gin.H{
+				"code":    "INVALID_CREDENTIALS",
+				"message": "Invalid email or password",
+			},
+		})
+		return
+	}
+
+	if !user.Active {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": gin.H{
+				"code":    "ACCOUNT_DISABLED",
+				"message": "Your account has been disabled",
+			},
+		})
+		return
+	}
+
+	if user.Password == "" {
+		provider := user.Provider
+		if provider == "" || provider == "local" {
+			provider = "social login"
+		}
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": gin.H{
+				"code":    "SOCIAL_AUTH_ONLY",
+				"message": fmt.Sprintf("This account uses %s. Please sign in with your social account.", provider),
+			},
+		})
+		return
+	}
+
+	if !user.CheckPassword(req.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": gin.H{
+				"code":    "INVALID_CREDENTIALS",
+				"message": "Invalid email or password",
+			},
+		})
+		return
+	}
+
+	// Check if user has TOTP enabled
+	var totpConfig models.TwoFactorConfig
+	if err := h.DB.Where("user_id = ? AND enabled = ?", user.ID, true).First(&totpConfig).Error; err == nil {
+		// TOTP is enabled — check for trusted device
+		if !handlers.IsTrustedDevice(c, h.DB, user.ID) {
+			// Generate a short-lived pending token for TOTP verification
+			pendingToken, err := totp.GeneratePendingToken()
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": gin.H{"code": "TOKEN_ERROR", "message": "Failed to create verification session"},
+				})
+				return
+			}
+
+			// Store hashed pending token in DB
+			h.DB.Create(&models.TOTPPendingToken{
+				UserID:    user.ID,
+				TokenHash: totp.HashToken(pendingToken),
+				ExpiresAt: time.Now().Add(totp.PendingTokenExpiry),
+			})
+
+			c.JSON(http.StatusOK, gin.H{
+				"data": gin.H{
+					"totp_required": true,
+					"pending_token": pendingToken,
+				},
+				"message": "Two-factor authentication required",
+			})
+			return
+		}
+	}
+
+	tokens, err := h.AuthService.GenerateTokenPair(user.ID, user.Email, user.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "TOKEN_ERROR",
+				"message": "Failed to generate tokens",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"user":   user,
+			"tokens": tokens,
+		},
+		"message": "Logged in successfully",
+	})
+}
+
+// Refresh generates a new access token from a refresh token.
+func (h *AuthHandler) Refresh(c *gin.Context) {
+	var req refreshRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": gin.H{
+				"code":    "VALIDATION_ERROR",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	claims, err := h.AuthService.ValidateToken(req.RefreshToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": gin.H{
+				"code":    "INVALID_TOKEN",
+				"message": "Invalid or expired refresh token",
+			},
+		})
+		return
+	}
+
+	tokens, err := h.AuthService.GenerateTokenPair(claims.UserID, claims.Email, claims.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "TOKEN_ERROR",
+				"message": "Failed to generate tokens",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"tokens": tokens,
+		},
+		"message": "Token refreshed successfully",
+	})
+}
+
+// Logout invalidates the user's session.
+func (h *AuthHandler) Logout(c *gin.Context) {
+	// In a production system, you would blacklist the refresh token in Redis
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Logged out successfully",
+	})
+}
+
+// Me returns the current authenticated user.
+func (h *AuthHandler) Me(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": gin.H{
+				"code":    "UNAUTHORIZED",
+				"message": "Not authenticated",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": user,
+	})
+}
+
+// ForgotPassword initiates a password reset.
+func (h *AuthHandler) ForgotPassword(c *gin.Context) {
+	var req forgotPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": gin.H{
+				"code":    "VALIDATION_ERROR",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	var user models.User
+	if err := h.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+		// Return success even if email not found (security)
+		c.JSON(http.StatusOK, gin.H{
+			"message": "If an account with that email exists, a password reset link has been sent",
+		})
+		return
+	}
+
+	token, err := services.GenerateResetToken()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Failed to generate reset token",
+			},
+		})
+		return
+	}
+
+	// For Phase 1, just log the token (email integration comes in Phase 4)
+	log.Printf("Password reset token for %s: %s", user.Email, token)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "If an account with that email exists, a password reset link has been sent",
+	})
+}
+
+// ResetPassword resets a user's password with a valid token.
+func (h *AuthHandler) ResetPassword(c *gin.Context) {
+	var req resetPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": gin.H{
+				"code":    "VALIDATION_ERROR",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	// Phase 1: simplified reset (in production, validate the token against stored tokens)
+	// For now, this is a placeholder that demonstrates the API contract
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Failed to hash password",
+			},
+		})
+		return
+	}
+	_ = hashedPassword
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Password reset successfully",
+	})
+}
+
+// OAuthBegin redirects the user to the OAuth provider's consent screen.
+func (h *AuthHandler) OAuthBegin(c *gin.Context) {
+	provider := c.Param("provider")
+
+	// Gothic reads provider from query string, not URL params
+	q := c.Request.URL.Query()
+	q.Set("provider", provider)
+	c.Request.URL.RawQuery = q.Encode()
+
+	gothic.BeginAuthHandler(c.Writer, c.Request)
+}
+
+// OAuthCallback completes the OAuth flow, finds or creates the user, and redirects with JWT tokens.
+func (h *AuthHandler) OAuthCallback(c *gin.Context) {
+	provider := c.Param("provider")
+
+	q := c.Request.URL.Query()
+	q.Set("provider", provider)
+	c.Request.URL.RawQuery = q.Encode()
+
+	gothUser, err := gothic.CompleteUserAuth(c.Writer, c.Request)
+	if err != nil {
+		log.Printf("OAuth callback error: %v", err)
+		redirectURL := fmt.Sprintf("%s/login?error=%s", h.Config.OAuthFrontendURL, url.QueryEscape("Authentication failed. Please try again."))
+		c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+		return
+	}
+
+	// Find or create user by email
+	var user models.User
+	result := h.DB.Where("email = ?", gothUser.Email).First(&user)
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			// Create new user from OAuth data
+			now := time.Now()
+			user = models.User{
+				FirstName:       gothUser.FirstName,
+				LastName:        gothUser.LastName,
+				Email:           gothUser.Email,
+				Avatar:          gothUser.AvatarURL,
+				Provider:        provider,
+				Active:          true,
+				EmailVerifiedAt: &now,
+				IPAddress:       c.ClientIP(),
+			}
+
+			if provider == "google" {
+				user.GoogleID = gothUser.UserID
+			} else if provider == "github" {
+				user.GithubID = gothUser.UserID
+			}
+
+			// If name is empty, try to use NickName
+			if user.FirstName == "" && gothUser.NickName != "" {
+				user.FirstName = gothUser.NickName
+			}
+			if user.FirstName == "" {
+				user.FirstName = "User"
+			}
+			if user.LastName == "" {
+				user.LastName = ""
+			}
+
+			if err := h.DB.Create(&user).Error; err != nil {
+				log.Printf("OAuth: failed to create user: %v", err)
+				redirectURL := fmt.Sprintf("%s/login?error=%s", h.Config.OAuthFrontendURL, url.QueryEscape("Failed to create account."))
+				c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+				return
+			}
+		} else {
+			log.Printf("OAuth: database error: %v", result.Error)
+			redirectURL := fmt.Sprintf("%s/login?error=%s", h.Config.OAuthFrontendURL, url.QueryEscape("Something went wrong."))
+			c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+			return
+		}
+	} else {
+		// Link OAuth provider to existing account
+		updates := map[string]interface{}{}
+		if provider == "google" && user.GoogleID == "" {
+			updates["google_id"] = gothUser.UserID
+		} else if provider == "github" && user.GithubID == "" {
+			updates["github_id"] = gothUser.UserID
+		}
+		if user.Avatar == "" && gothUser.AvatarURL != "" {
+			updates["avatar"] = gothUser.AvatarURL
+		}
+		if user.Provider == "local" {
+			updates["provider"] = provider
+		}
+
+		if len(updates) > 0 {
+			h.DB.Model(&user).Updates(updates)
+		}
+	}
+
+	if !user.Active {
+		redirectURL := fmt.Sprintf("%s/login?error=%s", h.Config.OAuthFrontendURL, url.QueryEscape("Your account has been disabled."))
+		c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+		return
+	}
+
+	// Generate JWT tokens
+	tokens, err := h.AuthService.GenerateTokenPair(user.ID, user.Email, user.Role)
+	if err != nil {
+		log.Printf("OAuth: failed to generate tokens: %v", err)
+		redirectURL := fmt.Sprintf("%s/login?error=%s", h.Config.OAuthFrontendURL, url.QueryEscape("Failed to sign in."))
+		c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+		return
+	}
+
+	// Redirect to frontend with tokens
+	redirectURL := fmt.Sprintf("%s/auth/callback?access_token=%s&refresh_token=%s",
+		h.Config.OAuthFrontendURL,
+		url.QueryEscape(tokens.AccessToken),
+		url.QueryEscape(tokens.RefreshToken),
+	)
+	c.Redirect(http.StatusTemporaryRedirect, redirectURL)
+}
+`
+}
+
+func apiUserHandlerGo() string {
+	return `package handlers
+
+import (
+	"math"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+
+	"` + "{{MODULE}}" + `/internal/models"
+)
+
+// UserHandler handles user management endpoints.
+type UserHandler struct {
+	DB *gorm.DB
+}
+
+// Create creates a new user (admin only).
+func (h *UserHandler) Create(c *gin.Context) {
+	var req struct {
+		FirstName string ` + "`" + `json:"first_name" binding:"required"` + "`" + `
+		LastName  string ` + "`" + `json:"last_name" binding:"required"` + "`" + `
+		Email     string ` + "`" + `json:"email" binding:"required,email"` + "`" + `
+		Password  string ` + "`" + `json:"password" binding:"required,min=6"` + "`" + `
+		Role      string ` + "`" + `json:"role"` + "`" + `
+		Avatar    string ` + "`" + `json:"avatar"` + "`" + `
+		JobTitle  string ` + "`" + `json:"job_title"` + "`" + `
+		Active    *bool  ` + "`" + `json:"active"` + "`" + `
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": gin.H{
+				"code":    "VALIDATION_ERROR",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	// Check email uniqueness
+	var existing models.User
+	if err := h.DB.Where("email = ?", req.Email).First(&existing).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"error": gin.H{
+				"code":    "EMAIL_EXISTS",
+				"message": "A user with this email already exists",
+			},
+		})
+		return
+	}
+
+	user := models.User{
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     req.Email,
+		Password:  req.Password,
+		Role:      req.Role,
+		Avatar:    req.Avatar,
+		JobTitle:  req.JobTitle,
+		Active:    true,
+	}
+
+	if req.Active != nil {
+		user.Active = *req.Active
+	}
+	if user.Role == "" {
+		user.Role = models.RoleUser
+	}
+
+	if err := h.DB.Create(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Failed to create user",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"data":    user,
+		"message": "User created successfully",
+	})
+}
+
+// List returns a paginated list of users.
+func (h *UserHandler) List(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
+	search := c.Query("search")
+	sortBy := c.DefaultQuery("sort_by", "created_at")
+	sortOrder := c.DefaultQuery("sort_order", "desc")
+
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 20
+	}
+
+	// Validate sort order
+	if sortOrder != "asc" && sortOrder != "desc" {
+		sortOrder = "desc"
+	}
+
+	// Validate sort column
+	allowedSorts := map[string]bool{
+		"id": true, "first_name": true, "last_name": true, "email": true, "role": true, "created_at": true,
+	}
+	if !allowedSorts[sortBy] {
+		sortBy = "created_at"
+	}
+
+	query := h.DB.Model(&models.User{})
+
+	// Search
+	if search != "" {
+		query = query.Where("first_name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?", "%"+search+"%", "%"+search+"%", "%"+search+"%")
+	}
+
+	// Count total
+	var total int64
+	query.Count(&total)
+
+	// Fetch paginated results
+	var users []models.User
+	offset := (page - 1) * pageSize
+	if err := query.Order(sortBy + " " + sortOrder).Offset(offset).Limit(pageSize).Find(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Failed to fetch users",
+			},
+		})
+		return
+	}
+
+	pages := int(math.Ceil(float64(total) / float64(pageSize)))
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": users,
+		"meta": gin.H{
+			"total":     total,
+			"page":      page,
+			"page_size": pageSize,
+			"pages":     pages,
+		},
+	})
+}
+
+// GetByID returns a single user by ID.
+func (h *UserHandler) GetByID(c *gin.Context) {
+	id := c.Param("id")
+
+	var user models.User
+	if err := h.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": gin.H{
+				"code":    "NOT_FOUND",
+				"message": "User not found",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": user,
+	})
+}
+
+// Update modifies an existing user.
+func (h *UserHandler) Update(c *gin.Context) {
+	id := c.Param("id")
+
+	var user models.User
+	if err := h.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": gin.H{
+				"code":    "NOT_FOUND",
+				"message": "User not found",
+			},
+		})
+		return
+	}
+
+	var req struct {
+		FirstName string ` + "`" + `json:"first_name"` + "`" + `
+		LastName  string ` + "`" + `json:"last_name"` + "`" + `
+		Email     string ` + "`" + `json:"email"` + "`" + `
+		Password  string ` + "`" + `json:"password"` + "`" + `
+		Role      string ` + "`" + `json:"role"` + "`" + `
+		Avatar    string ` + "`" + `json:"avatar"` + "`" + `
+		JobTitle  string ` + "`" + `json:"job_title"` + "`" + `
+		Bio       string ` + "`" + `json:"bio"` + "`" + `
+		Active    *bool  ` + "`" + `json:"active"` + "`" + `
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": gin.H{
+				"code":    "VALIDATION_ERROR",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	updates := map[string]interface{}{}
+	if req.FirstName != "" {
+		updates["first_name"] = req.FirstName
+	}
+	if req.LastName != "" {
+		updates["last_name"] = req.LastName
+	}
+	if req.Email != "" {
+		updates["email"] = req.Email
+	}
+	if req.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": gin.H{
+					"code":    "INTERNAL_ERROR",
+					"message": "Failed to hash password",
+				},
+			})
+			return
+		}
+		updates["password"] = string(hashedPassword)
+	}
+	if req.Role != "" {
+		updates["role"] = req.Role
+	}
+	if req.Avatar != "" {
+		updates["avatar"] = req.Avatar
+	}
+	if req.JobTitle != "" {
+		updates["job_title"] = req.JobTitle
+	}
+	if req.Bio != "" {
+		updates["bio"] = req.Bio
+	}
+	if req.Active != nil {
+		updates["active"] = *req.Active
+	}
+
+	if err := h.DB.Model(&user).Updates(updates).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Failed to update user",
+			},
+		})
+		return
+	}
+
+	// Reload to get updated values
+	h.DB.First(&user, id)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":    user,
+		"message": "User updated successfully",
+	})
+}
+
+// Delete soft-deletes a user.
+func (h *UserHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	var user models.User
+	if err := h.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": gin.H{
+				"code":    "NOT_FOUND",
+				"message": "User not found",
+			},
+		})
+		return
+	}
+
+	if err := h.DB.Delete(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Failed to delete user",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User deleted successfully",
+	})
+}
+
+// GetProfile returns the currently authenticated user's profile.
+func (h *UserHandler) GetProfile(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+
+	var user models.User
+	if err := h.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": gin.H{
+				"code":    "NOT_FOUND",
+				"message": "User not found",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": user,
+	})
+}
+
+// UpdateProfile updates the currently authenticated user's profile.
+func (h *UserHandler) UpdateProfile(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+
+	var user models.User
+	if err := h.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": gin.H{
+				"code":    "NOT_FOUND",
+				"message": "User not found",
+			},
+		})
+		return
+	}
+
+	var req struct {
+		FirstName string ` + "`" + `json:"first_name"` + "`" + `
+		LastName  string ` + "`" + `json:"last_name"` + "`" + `
+		Email     string ` + "`" + `json:"email"` + "`" + `
+		Password  string ` + "`" + `json:"password"` + "`" + `
+		Avatar    string ` + "`" + `json:"avatar"` + "`" + `
+		JobTitle  string ` + "`" + `json:"job_title"` + "`" + `
+		Bio       string ` + "`" + `json:"bio"` + "`" + `
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": gin.H{
+				"code":    "VALIDATION_ERROR",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	updates := map[string]interface{}{}
+	if req.FirstName != "" {
+		updates["first_name"] = req.FirstName
+	}
+	if req.LastName != "" {
+		updates["last_name"] = req.LastName
+	}
+	if req.Email != "" {
+		updates["email"] = req.Email
+	}
+	if req.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": gin.H{
+					"code":    "INTERNAL_ERROR",
+					"message": "Failed to hash password",
+				},
+			})
+			return
+		}
+		updates["password"] = string(hashedPassword)
+	}
+	if req.Avatar != "" {
+		updates["avatar"] = req.Avatar
+	}
+	if req.JobTitle != "" {
+		updates["job_title"] = req.JobTitle
+	}
+	if req.Bio != "" {
+		updates["bio"] = req.Bio
+	}
+
+	if err := h.DB.Model(&user).Updates(updates).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Failed to update profile",
+			},
+		})
+		return
+	}
+
+	h.DB.First(&user, userID)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":    user,
+		"message": "Profile updated successfully",
+	})
+}
+
+// DeleteProfile soft-deletes the currently authenticated user's account.
+func (h *UserHandler) DeleteProfile(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+
+	var user models.User
+	if err := h.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": gin.H{
+				"code":    "NOT_FOUND",
+				"message": "User not found",
+			},
+		})
+		return
+	}
+
+	if err := h.DB.Delete(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": gin.H{
+				"code":    "INTERNAL_ERROR",
+				"message": "Failed to delete account",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Account deleted successfully",
+	})
+}
+`
+}
+
+func apiAuthMiddlewareGo() string {
+	return `package middleware
+
+import (
+	"net/http"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
+	"` + "{{MODULE}}" + `/internal/models"
+	"` + "{{MODULE}}" + `/internal/services"
+)
+
+// Auth creates a JWT authentication middleware.
+func Auth(db *gorm.DB, authService *services.AuthService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": gin.H{
+					"code":    "UNAUTHORIZED",
+					"message": "Authorization header is required",
+				},
+			})
+			c.Abort()
+			return
+		}
+
+		parts := strings.SplitN(authHeader, " ", 2)
+		if len(parts) != 2 || parts[0] != "Bearer" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": gin.H{
+					"code":    "UNAUTHORIZED",
+					"message": "Invalid authorization header format",
+				},
+			})
+			c.Abort()
+			return
+		}
+
+		claims, err := authService.ValidateToken(parts[1])
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": gin.H{
+					"code":    "UNAUTHORIZED",
+					"message": "Invalid or expired token",
+				},
+			})
+			c.Abort()
+			return
+		}
+
+		// Load user from database
+		var user models.User
+		if err := db.First(&user, claims.UserID).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": gin.H{
+					"code":    "UNAUTHORIZED",
+					"message": "User not found",
+				},
+			})
+			c.Abort()
+			return
+		}
+
+		if !user.Active {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": gin.H{
+					"code":    "ACCOUNT_DISABLED",
+					"message": "Your account has been disabled",
+				},
+			})
+			c.Abort()
+			return
+		}
+
+		c.Set("user", user)
+		c.Set("user_id", user.ID)
+		c.Set("user_role", user.Role)
+		c.Next()
+	}
+}
+
+// RequireRole creates a middleware that checks if the user has one of the required roles.
+func RequireRole(roles ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userRole, exists := c.Get("user_role")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": gin.H{
+					"code":    "UNAUTHORIZED",
+					"message": "Not authenticated",
+				},
+			})
+			c.Abort()
+			return
+		}
+
+		role, ok := userRole.(string)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": gin.H{
+					"code":    "INTERNAL_ERROR",
+					"message": "Invalid user role",
+				},
+			})
+			c.Abort()
+			return
+		}
+
+		for _, r := range roles {
+			if role == r {
+				c.Next()
+				return
+			}
+		}
+
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": gin.H{
+				"code":    "FORBIDDEN",
+				"message": "You do not have permission to access this resource",
+			},
+		})
+		c.Abort()
+	}
+}
+`
+}
+
+func apiCorsMiddlewareGo() string {
+	return `package middleware
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+// CORS creates a CORS middleware with the given allowed origins.
+func CORS(allowedOrigins []string) gin.HandlerFunc {
+	originsMap := make(map[string]bool)
+	for _, origin := range allowedOrigins {
+		originsMap[origin] = true
+	}
+
+	return func(c *gin.Context) {
+		origin := c.GetHeader("Origin")
+
+		if originsMap[origin] {
+			c.Header("Access-Control-Allow-Origin", origin)
+		}
+
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Max-Age", "86400")
+
+		if c.Request.Method == http.MethodOptions {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
+	}
+}
+`
+}
+
+func apiLoggerMiddlewareGo() string {
+	return `package middleware
+
+import (
+	"compress/gzip"
+	"fmt"
+	"log"
+	"math/rand"
+	"strings"
+	"time"
+
+	"github.com/gin-gonic/gin"
+)
+
+// RequestID injects a unique X-Request-ID header into every request and
+// stores it in the context for downstream logging and tracing.
+func RequestID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		requestID := c.GetHeader("X-Request-ID")
+		if requestID == "" {
+			requestID = fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Int63())
+		}
+		c.Set("request_id", requestID)
+		c.Header("X-Request-ID", requestID)
+		c.Next()
+	}
+}
+
+// Gzip compresses responses using gzip encoding when the client supports it.
+func Gzip() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !strings.Contains(c.GetHeader("Accept-Encoding"), "gzip") {
+			c.Next()
+			return
+		}
+
+		gz, err := gzip.NewWriterLevel(c.Writer, gzip.BestSpeed)
+		if err != nil {
+			c.Next()
+			return
+		}
+		defer gz.Close()
+
+		c.Header("Content-Encoding", "gzip")
+		c.Header("Vary", "Accept-Encoding")
+		c.Writer = &gzipResponseWriter{ResponseWriter: c.Writer, Writer: gz}
+		c.Next()
+	}
+}
+
+type gzipResponseWriter struct {
+	gin.ResponseWriter
+	Writer *gzip.Writer
+}
+
+func (g *gzipResponseWriter) Write(data []byte) (int, error) {
+	return g.Writer.Write(data)
+}
+
+func (g *gzipResponseWriter) WriteString(s string) (int, error) {
+	return g.Writer.Write([]byte(s))
+}
+
+// Logger creates a structured logging middleware with request ID correlation.
+func Logger() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+		path := c.Request.URL.Path
+		query := c.Request.URL.RawQuery
+
+		c.Next()
+
+		latency := time.Since(start)
+		status := c.Writer.Status()
+		method := c.Request.Method
+		clientIP := c.ClientIP()
+		requestID, _ := c.Get("request_id")
+
+		if query != "" {
+			path = path + "?" + query
+		}
+
+		log.Printf("[%d] %s %s | %s | %v | id=%v",
+			status,
+			method,
+			path,
+			clientIP,
+			latency,
+			requestID,
+		)
+	}
+}
+`
+}
+
+func apiMaintenanceMiddlewareGo() string {
+	return `package middleware
+
+import (
+	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
+)
+
+// Maintenance returns a middleware that checks for a .maintenance file.
+// When the file exists, all requests receive a 503 Service Unavailable response.
+// Toggle with: jua down (enable) / jua up (disable)
+func Maintenance() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if _, err := os.Stat(".maintenance"); err == nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"error": gin.H{
+					"code":    "MAINTENANCE",
+					"message": "Application is in maintenance mode. Please try again later.",
+				},
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+`
+}
+
+func apiRoutesGo() string {
+	return `package routes
+
+import (
+	"context"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/katuramuh/gin-docs/gindocs"
+	"github.com/katuramuh/gorm-studio/studio"
+	"github.com/katuramuh/pulse/pulse"
+	"github.com/katuramuh/sentinel"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+
+	"` + "{{MODULE}}" + `/internal/ai"
+	"` + "{{MODULE}}" + `/internal/cache"
+	"` + "{{MODULE}}" + `/internal/config"
+	"` + "{{MODULE}}" + `/internal/handlers"
+	"` + "{{MODULE}}" + `/internal/mail"
+	"` + "{{MODULE}}" + `/internal/middleware"
+	"` + "{{MODULE}}" + `/internal/models"
+	"` + "{{MODULE}}" + `/internal/jobs"
+	"` + "{{MODULE}}" + `/internal/services"
+	"` + "{{MODULE}}" + `/internal/storage"
+)
+
+// Services holds all Phase 4 services for dependency injection.
+type Services struct {
+	Cache   *cache.Cache
+	Storage *storage.Storage
+	Mailer  *mail.Mailer
+	AI      *ai.AI
+	Jobs    *jobs.Client
+}
+
+// Setup configures all routes and returns the Gin engine.
+func Setup(db *gorm.DB, cfg *config.Config, svc *Services) *gin.Engine {
+	if cfg.AppEnv == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	r := gin.New()
+
+	// Global middleware
+	r.Use(middleware.Maintenance())
+	r.Use(middleware.RequestID())
+	r.Use(middleware.Logger())
+	r.Use(gin.Recovery())
+	r.Use(middleware.CORS(cfg.CORSOrigins))
+	r.Use(middleware.Gzip())
+
+	// Mount Sentinel security suite (WAF, rate limiting, auth shield, anomaly detection)
+	if cfg.SentinelEnabled {
+		sentinel.Mount(r, db, sentinel.Config{
+			Dashboard: sentinel.DashboardConfig{
+				Username:  cfg.SentinelUsername,
+				Password:  cfg.SentinelPassword,
+				SecretKey: cfg.SentinelSecretKey,
+			},
+			WAF: sentinel.WAFConfig{
+				Enabled: true,
+				Mode:    sentinel.ModeLog, // Switch to sentinel.ModeBlock in production
+			},
+			RateLimit: sentinel.RateLimitConfig{
+				Enabled: true,
+				ByIP:    &sentinel.Limit{Requests: 100, Window: 1 * time.Minute},
+				ByRoute: map[string]sentinel.Limit{
+					"/api/auth/login":    {Requests: 5, Window: 15 * time.Minute},
+					"/api/auth/register": {Requests: 3, Window: 15 * time.Minute},
+				},
+			},
+			AuthShield: sentinel.AuthShieldConfig{
+				Enabled:    true,
+				LoginRoute: "/api/auth/login",
+			},
+			Anomaly: sentinel.AnomalyConfig{
+				Enabled: true,
+			},
+			Geo: sentinel.GeoConfig{
+				Enabled: true,
+			},
+		})
+		log.Println("Sentinel security suite mounted at /sentinel")
+	}
+
+	// Mount GORM Studio
+	if cfg.GORMStudioEnabled {
+		studioCfg := studio.Config{
+			Prefix: "/studio",
+		}
+		if cfg.GORMStudioUsername != "" && cfg.GORMStudioPassword != "" {
+			studioCfg.AuthMiddleware = gin.BasicAuth(gin.Accounts{
+				cfg.GORMStudioUsername: cfg.GORMStudioPassword,
+			})
+		}
+		studio.Mount(r, db, []interface{}{&models.User{}, &models.Upload{}, &models.Blog{}, /* jua:studio */}, studioCfg)
+		log.Println("GORM Studio mounted at /studio")
+	}
+
+	// API Documentation (gin-docs — auto-generated from routes + models)
+	gindocs.Mount(r, db, gindocs.Config{
+		Title:       cfg.AppName + " API",
+		Description: "REST API built with [Jua](https://juaframework.dev) — Go + React meta-framework.",
+		Version:     "1.0.0",
+		UI:          gindocs.UIScalar,
+		ScalarTheme: "kepler",
+		Models:      []interface{}{&models.User{}, &models.Upload{}, &models.Blog{}},
+		Auth: gindocs.AuthConfig{
+			Type:         gindocs.AuthBearer,
+			BearerFormat: "JWT",
+		},
+	})
+	log.Println("API docs available at /docs")
+
+	// Mount Pulse observability (request tracing, DB monitoring, runtime metrics, error tracking)
+	if cfg.PulseEnabled {
+		p := pulse.Mount(r, db, pulse.Config{
+			AppName: cfg.AppName,
+			DevMode: cfg.IsDevelopment(),
+			Dashboard: pulse.DashboardConfig{
+				Username: cfg.PulseUsername,
+				Password: cfg.PulsePassword,
+			},
+			Tracing: pulse.TracingConfig{
+				ExcludePaths: []string{"/studio/*", "/sentinel/*", "/docs/*", "/pulse/*"},
+			},
+			Alerts: pulse.AlertConfig{},
+			Prometheus: pulse.PrometheusConfig{
+				Enabled: true,
+			},
+		})
+
+		// Register health checks for connected services
+		if svc.Cache != nil {
+			p.AddHealthCheck(pulse.HealthCheck{
+				Name:     "redis",
+				Type:     "redis",
+				Critical: false,
+				CheckFunc: func(ctx context.Context) error {
+					return svc.Cache.Client().Ping(ctx).Err()
+				},
+			})
+		}
+
+		log.Println("Pulse observability mounted at /pulse")
+	}
+
+	// Auth service
+	authService := &services.AuthService{
+		Secret:        cfg.JWTSecret,
+		AccessExpiry:  cfg.JWTAccessExpiry,
+		RefreshExpiry: cfg.JWTRefreshExpiry,
+	}
+
+	// Handlers
+	authHandler := &handlers.AuthHandler{
+		DB:          db,
+		AuthService: authService,
+		Config:      cfg,
+	}
+	userHandler := &handlers.UserHandler{
+		DB: db,
+	}
+	uploadHandler := &handlers.UploadHandler{
+		DB:      db,
+		Storage: svc.Storage,
+		Jobs:    svc.Jobs,
+	}
+	aiHandler := &handlers.AIHandler{
+		AI: svc.AI,
+	}
+	jobsHandler := &handlers.JobsHandler{
+		RedisURL: cfg.RedisURL,
+	}
+	cronHandler := &handlers.CronHandler{}
+	blogHandler := handlers.NewBlogHandler(db)
+	uiRegistryHandler := handlers.NewUIRegistryHandler(db, cfg.AppURL)
+	totpHandler := &handlers.TOTPHandler{
+		DB:          db,
+		AuthService: authService,
+		Issuer:      cfg.TOTPIssuer,
+	}
+	// jua:handlers
+
+	// Health check
+	r.GET("/api/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  "ok",
+			"version": "0.1.0",
+		})
+	})
+
+	// Public Jua UI component registry (shadcn-compatible)
+	r.GET("/r.json", uiRegistryHandler.GetRegistry)
+	r.GET("/r/:name", uiRegistryHandler.GetComponent)
+
+	// Public blog routes (no auth required)
+	blogs := r.Group("/api/blogs")
+	{
+		blogs.GET("", blogHandler.ListPublished)
+		blogs.GET("/:slug", blogHandler.GetBySlug)
+	}
+
+	// Public auth routes
+	auth := r.Group("/api/auth")
+	{
+		auth.POST("/register", authHandler.Register)
+		auth.POST("/login", authHandler.Login)
+		auth.POST("/refresh", authHandler.Refresh)
+		auth.POST("/forgot-password", authHandler.ForgotPassword)
+		auth.POST("/reset-password", authHandler.ResetPassword)
+	}
+
+	// OAuth2 social login
+	oauth := auth.Group("/oauth")
+	{
+		oauth.GET("/:provider", authHandler.OAuthBegin)
+		oauth.GET("/:provider/callback", authHandler.OAuthCallback)
+	}
+
+	// TOTP verification (public — uses pending tokens, not JWT)
+	auth.POST("/totp/verify", totpHandler.Verify)
+	auth.POST("/totp/backup-codes/verify", totpHandler.VerifyBackupCode)
+
+	// Protected routes
+	protected := r.Group("/api")
+	protected.Use(middleware.Auth(db, authService))
+	{
+		protected.GET("/auth/me", authHandler.Me)
+		protected.POST("/auth/logout", authHandler.Logout)
+
+		// Two-Factor Authentication (TOTP)
+		protected.POST("/auth/totp/setup", totpHandler.Setup)
+		protected.POST("/auth/totp/enable", totpHandler.Enable)
+		protected.POST("/auth/totp/disable", totpHandler.Disable)
+		protected.GET("/auth/totp/status", totpHandler.Status)
+		protected.POST("/auth/totp/backup-codes", totpHandler.RegenerateBackupCodes)
+		protected.DELETE("/auth/totp/trusted-devices", totpHandler.RevokeTrustedDevices)
+
+		// User routes (authenticated)
+		protected.GET("/users/:id", userHandler.GetByID)
+
+		// File uploads
+		protected.POST("/uploads", uploadHandler.Create)
+		protected.POST("/uploads/presign", uploadHandler.Presign)
+		protected.POST("/uploads/complete", uploadHandler.CompleteUpload)
+		protected.GET("/uploads", uploadHandler.List)
+		protected.GET("/uploads/:id", uploadHandler.GetByID)
+		protected.DELETE("/uploads/:id", uploadHandler.Delete)
+
+		// AI
+		protected.POST("/ai/complete", aiHandler.Complete)
+		protected.POST("/ai/chat", aiHandler.Chat)
+		protected.POST("/ai/stream", aiHandler.Stream)
+
+		// Jua UI component registry (authenticated browse)
+		protected.GET("/ui-components", uiRegistryHandler.ListComponents)
+		protected.GET("/ui-components/:name", uiRegistryHandler.GetComponentDetail)
+
+		// jua:routes:protected
+	}
+
+	// Profile routes (any authenticated user)
+	profile := protected.Group("/profile")
+	{
+		profile.GET("", userHandler.GetProfile)
+		profile.PUT("", userHandler.UpdateProfile)
+		profile.DELETE("", userHandler.DeleteProfile)
+	}
+
+	// Admin routes
+	admin := r.Group("/api")
+	admin.Use(middleware.Auth(db, authService))
+	admin.Use(middleware.RequireRole("ADMIN"))
+	{
+		admin.GET("/users", userHandler.List)
+		admin.POST("/users", userHandler.Create)
+		admin.PUT("/users/:id", userHandler.Update)
+		admin.DELETE("/users/:id", userHandler.Delete)
+
+		// Admin system routes
+		admin.GET("/admin/jobs/stats", jobsHandler.Stats)
+		admin.GET("/admin/jobs/:status", jobsHandler.ListByStatus)
+		admin.POST("/admin/jobs/:id/retry", jobsHandler.Retry)
+		admin.DELETE("/admin/jobs/queue/:queue", jobsHandler.ClearQueue)
+		admin.GET("/admin/cron/tasks", cronHandler.ListTasks)
+
+		// Blog management (admin)
+		admin.GET("/admin/blogs", blogHandler.List)
+		admin.POST("/admin/blogs", blogHandler.Create)
+		admin.PUT("/admin/blogs/:id", blogHandler.Update)
+		admin.DELETE("/admin/blogs/:id", blogHandler.Delete)
+
+		// Jua UI component registry (admin management)
+		admin.POST("/admin/ui-components", uiRegistryHandler.CreateComponent)
+		admin.PUT("/admin/ui-components/:name", uiRegistryHandler.UpdateComponent)
+		admin.DELETE("/admin/ui-components/:name", uiRegistryHandler.DeleteComponent)
+
+		// jua:routes:admin
+	}
+
+	// Custom role-restricted routes
+	// jua:routes:custom
+
+	return r
+}
+`
+}

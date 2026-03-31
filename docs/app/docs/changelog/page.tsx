@@ -1,0 +1,1352 @@
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { SiteHeader } from '@/components/site-header'
+import { DocsSidebar } from '@/components/docs-sidebar'
+import { getDocMetadata } from '@/config/docs-metadata'
+
+export const metadata = getDocMetadata('/docs/changelog')
+
+export default function ChangelogPage() {
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <DocsSidebar />
+
+      <main className="lg:pl-64">
+        <div className="container max-w-screen-xl py-10 px-6">
+          <div className="max-w-3xl">
+            {/* Header */}
+            <div className="mb-10">
+              <span className="tag-mono text-primary/80 mb-3 block">Release History</span>
+              <h1 className="text-4xl font-bold tracking-tight mb-4">
+                Changelog
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                All notable changes to Jua are documented here. Each release includes new features,
+                bug fixes, and any breaking changes you need to be aware of.
+              </p>
+            </div>
+
+            {/* v3.6.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-accent/15 px-3 py-1 text-sm font-semibold text-primary">
+                  v3.6.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 27, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Scaffold into current directory</strong> &mdash; <code>jua new .</code> and{' '}
+                    <code>jua new ./</code> now scaffold into the current directory instead of creating a
+                    subfolder. Infers the project name from the folder name. Also auto-detects when the
+                    current directory name matches the project name.
+                  </li>
+                  <li>
+                    <strong><code>--force</code> flag</strong> &mdash; Allows scaffolding into non-empty
+                    directories. Useful when a repo was cloned first (with README, .git, LICENSE) before
+                    scaffolding: <code>jua new . --triple --vite --force</code>.
+                  </li>
+                  <li>
+                    <strong><code>--here</code> flag</strong> &mdash; Explicit alternative to{' '}
+                    <code>jua new .</code> for in-place scaffolding.
+                  </li>
+                  <li>
+                    <strong>30 standalone courses</strong> &mdash; Added 20 new courses to the learning
+                    platform (42 total across 3 tracks + 20 standalone). Topics include testing, GORM
+                    mastery, WebSockets, Stripe payments, blog/CMS, CI/CD, middleware, and the 100-component
+                    UI registry.
+                  </li>
+                </ul>
+
+                <h3>Bug Fixes</h3>
+                <ul>
+                  <li>
+                    <strong>Flags now skip interactive prompt</strong> &mdash; Running{' '}
+                    <code>jua new myapp --triple --vite</code> no longer shows the architecture/frontend
+                    selection prompt. Flags act as true shortcuts for non-interactive setup.
+                  </li>
+                  <li>
+                    <strong>Module path upgrade to /v3</strong> &mdash; Fixed{' '}
+                    <code>go install ...@latest</code> downloading v2.9.0 instead of v3.x.{' '}
+                    All import paths updated from <code>jua/v2</code> to <code>jua/v3</code>.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v3.5.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v3.5.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 26, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    <strong>Full docs redesign</strong> &mdash; Rebuilt the documentation site with a
+                    Tailwind CSS-inspired aesthetic. New dark theme (<code>#0b1120</code>), sky-blue accents,
+                    cleaner header with backdrop blur, redesigned code blocks with file tabs and line
+                    highlighting, and new <code>StepWithCode</code> component for two-column step-by-step
+                    guides (text left, code right).
+                  </li>
+                  <li>
+                    <strong>Installation page redesigned</strong> &mdash; Step-numbered sections (01-04)
+                    with the new two-column layout, system requirements table, architecture shortcuts,
+                    and services grid.
+                  </li>
+                  <li>
+                    <strong>Architecture Modes page</strong> &mdash; Visual cards for all 5 architectures
+                    (single, double, triple, API only, mobile) with directory structure trees, features
+                    list, ideal use cases, and frontend framework comparison.
+                  </li>
+                  <li>
+                    <strong>TanStack Router guide</strong> &mdash; Complete guide for the TanStack Router
+                    frontend option: project structure, routing patterns, comparison table with Next.js,
+                    route examples, and admin panel auth guards.
+                  </li>
+                  <li>
+                    <strong>New CLI Commands page</strong> &mdash; Documents <code>jua routes</code>,
+                    <code>jua down/up</code> (maintenance mode), and <code>jua deploy</code>. Includes
+                    complete command reference table for all 21 CLI commands.
+                  </li>
+                  <li>
+                    <strong>Deploy Command guide</strong> &mdash; Step-by-step deployment pipeline with
+                    systemd service unit and Caddyfile examples, flags table.
+                  </li>
+                </ul>
+
+                <h3>Improvements</h3>
+                <ul>
+                  <li>Updated skill file with all v3.x architecture modes, frontend options, and new CLI commands.</li>
+                  <li>Updated sidebar with new pages: Architecture Modes, New CLI Commands, TanStack Router, Deploy Command.</li>
+                  <li>Frontend sidebar section renamed from &ldquo;Frontend (Next.js)&rdquo; to &ldquo;Frontend&rdquo; to reflect multi-framework support.</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v3.4.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v3.4.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 26, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Multi-architecture code generator</strong> &mdash; <code>jua generate resource</code>
+                    now works for all 5 architecture modes and both frontend frameworks. Generates Go model,
+                    service, and handler at the correct path (<code>internal/</code> for single app,
+                    <code>apps/api/internal/</code> for monorepo). Generates React Query hooks and admin
+                    resource pages for both Next.js and TanStack Router.
+                  </li>
+                  <li>
+                    <strong><code>jua.json</code> project manifest</strong> &mdash; Every scaffolded project
+                    now includes a <code>jua.json</code> file at the root with <code>architecture</code> and
+                    <code>frontend</code> fields. The generator reads this to determine correct file paths
+                    and template variants, eliminating fragile filesystem heuristics.
+                  </li>
+                  <li>
+                    <strong>TanStack Router resource generation</strong> &mdash; When generating resources
+                    in a TanStack Router project, creates route files at
+                    <code>src/routes/_dashboard/resources/</code> using <code>createFileRoute</code> instead
+                    of Next.js <code>app/(dashboard)/resources/</code> page convention.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v3.3.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v3.3.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 26, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features (Goravel-Inspired)</h3>
+                <ul>
+                  <li>
+                    <strong><code>jua routes</code></strong> &mdash; List all registered API routes in a
+                    formatted table. Parses <code>routes.go</code> and shows method, path, handler, and
+                    middleware group (public/protected/admin). Works for both monorepo and single app projects.
+                  </li>
+                  <li>
+                    <strong><code>jua down</code> / <code>jua up</code></strong> &mdash; Maintenance mode.
+                    <code>jua down</code> creates a <code>.maintenance</code> file that triggers the new
+                    maintenance middleware, returning 503 for all requests. <code>jua up</code> removes
+                    it and resumes normal operation.
+                  </li>
+                  <li>
+                    <strong><code>jua deploy</code></strong> &mdash; One-command production deployment.
+                    Cross-compiles for Linux, builds frontend, uploads binary via SCP, configures a systemd
+                    service, and optionally sets up Caddy reverse proxy with auto-TLS. Supports
+                    <code>--host</code>, <code>--domain</code>, <code>--key</code> flags or
+                    <code>DEPLOY_HOST</code>/<code>DEPLOY_DOMAIN</code>/<code>DEPLOY_KEY_FILE</code> env vars.
+                  </li>
+                  <li>
+                    <strong>Maintenance middleware</strong> &mdash; All scaffolded projects now include a
+                    <code>Maintenance()</code> Gin middleware that checks for a <code>.maintenance</code>
+                    file on every request. Runs as the first global middleware.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v3.2.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v3.2.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 26, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Single app architecture</strong> &mdash; <code>jua new my-app --single</code> creates
+                    a single Go binary that serves both the API and an embedded React SPA. Uses <code>go:embed</code>
+                    to bake the built frontend into the binary at compile time. One file to deploy. Dev mode runs
+                    Go on <code>:8080</code> and Vite on <code>:5173</code> with API proxy.
+                  </li>
+                  <li>
+                    <strong>Parameterized API paths</strong> &mdash; All Go API file generators now use
+                    <code>opts.APIRoot()</code> and <code>opts.Module()</code> helpers, enabling the same
+                    template functions to generate files for both monorepo (<code>apps/api/</code>) and
+                    single app (project root) architectures.
+                  </li>
+                </ul>
+
+                <h3>Single App Structure</h3>
+                <ul>
+                  <li><code>cmd/server/main.go</code> &mdash; Entry point with <code>go:embed frontend/dist/*</code> and SPA fallback routing</li>
+                  <li><code>internal/</code> &mdash; Full Go backend (same as monorepo API)</li>
+                  <li><code>frontend/</code> &mdash; React + Vite + TanStack Router SPA</li>
+                  <li><code>Makefile</code> &mdash; <code>make dev</code> (parallel servers), <code>make build</code> (single binary)</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v3.1.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v3.1.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 26, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>TanStack Router frontend scaffold</strong> &mdash; When selecting
+                    TanStack Router (Vite) as your frontend, both the web app and admin panel are
+                    now fully scaffolded with Vite + TanStack Router + React Query + Tailwind CSS.
+                    Includes file-based routing via <code>@tanstack/router-vite-plugin</code>,
+                    API proxy in dev mode, and all the same features as the Next.js scaffold.
+                  </li>
+                  <li>
+                    <strong>TanStack Router admin panel</strong> &mdash; Complete admin panel with
+                    TanStack Router: auth pages (login, sign-up, forgot password), dashboard layout
+                    with sidebar, resource management (users, blogs) via ResourcePage component,
+                    system pages (jobs, files, cron, mail, security), profile page. All existing
+                    React components (DataTable, FormBuilder, widgets) are reused with automatic
+                    <code>&quot;use client&quot;</code> directive stripping.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v3.0.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v3.0.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 26, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Interactive project creation</strong> &mdash; <code>jua new my-app</code> now
+                    launches an interactive prompt to select your architecture and frontend framework.
+                    Power users can skip with flags: <code>--single --vite</code>, <code>--triple --next</code>,
+                    <code>--api</code>, etc.
+                  </li>
+                  <li>
+                    <strong>5 architecture modes</strong> &mdash; Choose the project structure that fits your team:
+                    <strong>Single</strong> (Go API + embedded React SPA, one binary),
+                    <strong>Double</strong> (Web + API Turborepo),
+                    <strong>Triple</strong> (Web + Admin + API Turborepo),
+                    <strong>API Only</strong> (Go backend, no frontend),
+                    <strong>Mobile</strong> (API + Expo React Native).
+                  </li>
+                  <li>
+                    <strong>Frontend framework choice</strong> &mdash; Pick between <strong>Next.js</strong> (SSR,
+                    App Router) and <strong>TanStack Router</strong> (Vite, fast builds, small bundle, SPA).
+                    Available for all architecture modes that include a frontend.
+                  </li>
+                </ul>
+
+                <h3>Breaking Changes</h3>
+                <ul>
+                  <li>
+                    <strong>Options struct refactored</strong> &mdash; The internal <code>Options</code> struct
+                    now uses <code>Architecture</code> and <code>Frontend</code> enum fields instead of boolean
+                    flags. Legacy flags (<code>--api</code>, <code>--mobile</code>, <code>--full</code>) still
+                    work via the <code>Normalize()</code> migration layer.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v2.9.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v2.9.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 26, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Two-Factor Authentication (TOTP)</strong> &mdash; Every <code>jua new</code> project
+                    now includes a complete 2FA system with authenticator app support (Google Authenticator,
+                    Authy, 1Password, etc.). Zero-dependency RFC 6238 implementation with HMAC-SHA1.
+                    Includes setup flow with QR code URI generation, 6-digit code verification with
+                    &plusmn;1 window clock skew tolerance, and seamless integration with the existing
+                    JWT login flow.
+                  </li>
+                  <li>
+                    <strong>Backup Codes</strong> &mdash; 10 one-time-use recovery codes generated when
+                    enabling 2FA. Each code is individually bcrypt-hashed for storage. Codes can be
+                    regenerated at any time (invalidates previous set). Use during login as an alternative
+                    to the authenticator app.
+                  </li>
+                  <li>
+                    <strong>Trusted Devices</strong> &mdash; &ldquo;Remember this device&rdquo; option
+                    during TOTP verification. Sets an HttpOnly cookie with a SHA-256 hashed token stored
+                    in the database. Trusted devices last 30 days with sliding expiry (refreshed on each use).
+                    Users can revoke all trusted devices from their account.
+                  </li>
+                </ul>
+
+                <h3>New Endpoints</h3>
+                <ul>
+                  <li><code>POST /api/auth/totp/setup</code> &mdash; Generate TOTP secret + QR URI (authenticated)</li>
+                  <li><code>POST /api/auth/totp/enable</code> &mdash; Verify initial code and activate 2FA</li>
+                  <li><code>POST /api/auth/totp/verify</code> &mdash; Verify TOTP code during login (public, uses pending token)</li>
+                  <li><code>POST /api/auth/totp/backup-codes/verify</code> &mdash; Use backup code during login</li>
+                  <li><code>POST /api/auth/totp/disable</code> &mdash; Disable 2FA (requires password)</li>
+                  <li><code>GET /api/auth/totp/status</code> &mdash; Check 2FA status, remaining backup codes, trusted device count</li>
+                  <li><code>POST /api/auth/totp/backup-codes</code> &mdash; Regenerate backup codes</li>
+                  <li><code>DELETE /api/auth/totp/trusted-devices</code> &mdash; Revoke all trusted devices</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v2.8.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v2.8.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 16, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Vercel AI Gateway integration</strong> &mdash; Replaced the multi-provider AI service
+                    (Claude, OpenAI, Gemini with separate API implementations) with{' '}
+                    <a href="https://vercel.com/ai-gateway" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Vercel AI Gateway</a>.
+                    One API key now gives access to hundreds of models from all major providers through a single
+                    OpenAI-compatible endpoint. Models use the <code>provider/model</code> format
+                    (e.g. <code>anthropic/claude-sonnet-4-6</code>, <code>openai/gpt-5.4</code>,{' '}
+                    <code>google/gemini-2.5-pro</code>). Includes automatic retries, fallbacks,
+                    spend monitoring, and zero markup on tokens.
+                  </li>
+                </ul>
+
+                <h3>Breaking Changes</h3>
+                <ul>
+                  <li>
+                    <strong>AI environment variables</strong> &mdash; <code>AI_PROVIDER</code>,{' '}
+                    <code>AI_API_KEY</code>, and <code>AI_MODEL</code> have been replaced with{' '}
+                    <code>AI_GATEWAY_API_KEY</code>, <code>AI_GATEWAY_MODEL</code>, and{' '}
+                    <code>AI_GATEWAY_URL</code>. Update your <code>.env</code> file accordingly.
+                    Get your API key from{' '}
+                    <a href="https://vercel.com/ai-gateway" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">vercel.com/ai-gateway</a>.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v2.7.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v2.7.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 10, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>10 Official Plugins</strong> &mdash; New <code>jua-plugins</code> ecosystem with
+                    drop-in Go packages for common functionality: WebSockets (<code>jua-websockets</code>),
+                    Stripe payments (<code>jua-stripe</code>), OAuth social login (<code>jua-oauth</code>),
+                    notifications (<code>jua-notifications</code>), full-text search (<code>jua-search</code>),
+                    video processing (<code>jua-video</code>), WebRTC conferencing (<code>jua-conference</code>),
+                    outgoing webhooks (<code>jua-webhooks</code>), i18n translations (<code>jua-i18n</code>),
+                    and PDF/Excel/CSV export (<code>jua-export</code>). Each plugin includes a Claude Code
+                    skill file for AI-assisted integration.
+                  </li>
+                  <li>
+                    <strong>Claude Code Skills format</strong> &mdash; Updated the scaffolded AI skill file
+                    from a monolithic <code>JUA_SKILL.md</code> to the official Claude Code skills directory
+                    structure (<code>.claude/skills/jua/SKILL.md</code> + <code>reference.md</code>) with
+                    YAML frontmatter. AI assistants can now discover and use Jua conventions automatically.
+                  </li>
+                  <li>
+                    <strong>Jua UI component registry (100 components)</strong> &mdash; Expanded from 91 to
+                    100 pre-built components across 5 categories: marketing (21), auth (10), SaaS (30),
+                    ecommerce (20), and layout (20).
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/plugins" className="text-primary hover:underline">Plugins</Link>{' '}
+                    page &mdash; overview of all 10 plugins with installation, environment setup,
+                    quick start code, features, and use cases for each.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v2.6.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v2.6.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 6, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Fixes</h3>
+                <ul>
+                  <li>
+                    <strong>GORM Studio (Desktop)</strong> &mdash; Replaced the broken custom HTML studio with the real{' '}
+                    <code>gorm-studio</code> package. Desktop studio now runs on port 8080 at <code>/studio</code> using
+                    Gin + gorm-studio, matching the web scaffold. Auto-opens browser on launch.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v2.5.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-accent/15 px-3 py-1 text-sm font-semibold text-primary">
+                  v2.5.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 6, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>JUA_SKILL.md</strong> &mdash; Desktop scaffolds now include a <code>JUA_SKILL.md</code> file
+                    in the project root. This is a comprehensive AI reference (12 sections) covering architecture,
+                    CLI commands, resource generation, field types, code markers, golden rules, and common LLM mistakes
+                    &mdash; so AI assistants can work with the project correctly out of the box.
+                  </li>
+                  <li>
+                    <strong>Comprehensive README</strong> &mdash; The scaffolded <code>README.md</code> now includes a
+                    full project walkthrough, &ldquo;Adding a New Module&rdquo; guide, supported field types table,
+                    customization section (window size, title bar, database, app name), code markers reference,
+                    and a ready-to-use AI prompt for building a Task Manager app.
+                  </li>
+                </ul>
+
+                <h3>Fixes</h3>
+                <ul>
+                  <li>
+                    <strong>Dashboard stats cache</strong> &mdash; Dashboard statistics now update immediately after
+                    creating a blog or contact. Changed query keys from <code>[&quot;blogs-stats&quot;]</code> to{' '}
+                    <code>[&quot;blogs&quot;, &quot;stats&quot;]</code> so TanStack Query{`'`}s prefix matching
+                    invalidates dashboard queries when resources are created or deleted.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v2.4.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-accent/15 px-3 py-1 text-sm font-semibold text-primary">
+                  v2.4.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 5, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Window controls on auth pages</strong> &mdash; Login and register pages now include
+                    minimize, maximize, and close buttons with a draggable title area, so users can move and
+                    manage the window before signing in.
+                  </li>
+                  <li>
+                    <strong>Show/hide password toggle</strong> &mdash; All password fields on login and register
+                    pages now have an eye icon toggle to reveal or hide the password text.
+                  </li>
+                </ul>
+
+                <h3>Fixes</h3>
+                <ul>
+                  <li>
+                    <strong>Desktop build script</strong> &mdash; Removed <code>tsc</code> from the frontend
+                    build script. TanStack Router{`'`}s Vite plugin generates <code>routeTree.gen.ts</code> during
+                    the Vite build, so running <code>tsc</code> before Vite caused{' '}
+                    <code>Cannot find module {`'`}./routeTree.gen{`'`}</code> errors.
+                  </li>
+                  <li>
+                    <strong>Title bar import path</strong> &mdash; Fixed the Wails binding import in{' '}
+                    <code>title-bar.tsx</code> from a 2-level to 3-level relative path.
+                  </li>
+                  <li>
+                    <strong>Auth hook file extension</strong> &mdash; Renamed <code>use-auth.ts</code> to{' '}
+                    <code>use-auth.tsx</code> so TypeScript handles the JSX correctly.
+                  </li>
+                  <li>
+                    <strong>Create resource cache refresh</strong> &mdash; Blog and contact create pages now
+                    invalidate the React Query cache before navigating back, so new records appear in the
+                    table immediately.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v2.2.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v2.2.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 4, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Fixes</h3>
+                <ul>
+                  <li>
+                    <strong>Desktop auth hook file extension</strong> &mdash; Renamed the scaffolded{' '}
+                    <code>use-auth.ts</code> to <code>use-auth.tsx</code> so TypeScript correctly handles
+                    the JSX in <code>&lt;AuthContext.Provider&gt;</code>. Previously, <code>jua new-desktop</code>{' '}
+                    projects would fail to compile with <code>TS1005: {`'>'`} expected</code> errors.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    Added Desktop Handbook PDF download links to all 8 desktop documentation pages.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v2.1.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v2.1.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 4, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>TanStack Router for desktop</strong> &mdash; Migrated the desktop frontend from
+                    React Router to{' '}
+                    <a href="https://tanstack.com/router" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">TanStack Router</a>{' '}
+                    with file-based routing. Routes are auto-discovered by the Vite plugin &mdash; no centralized
+                    route registry. Uses <code>createHashHistory()</code> for Wails compatibility and{' '}
+                    <code>Route.useParams()</code> for type-safe params. Resource generation now creates 5 files
+                    (list, new, edit routes + model + service) and performs 10 injections (down from 12).
+                  </li>
+                  <li>
+                    <strong>Mobile navigation</strong> &mdash; Added a hamburger menu to the docs site header,
+                    visible below the <code>lg</code> breakpoint. Opens a Sheet sidebar with all navigation links.
+                    Auto-closes on link click.
+                  </li>
+                  <li>
+                    <strong>CGO-free SQLite</strong> &mdash; Replaced <code>gorm.io/driver/sqlite</code> (requires
+                    CGO) with <code>github.com/glebarez/sqlite</code> (pure Go) in all scaffold templates. Desktop
+                    apps now build and run without CGO or a C compiler.
+                  </li>
+                  <li>
+                    <strong>20 Desktop Project Ideas</strong> &mdash; New{' '}
+                    <Link href="/docs/desktop/project-ideas" className="text-primary hover:underline">project ideas page</Link>{' '}
+                    with 20 ready-to-build desktop app ideas across business, education, healthcare, logistics,
+                    and more. Each includes resources, field definitions, and <code>jua generate</code> commands.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    Added TanStack Router explanations to all desktop doc pages: overview, getting started,
+                    first app, resource generation, and POS app.
+                  </li>
+                  <li>
+                    Updated{' '}
+                    <Link href="/docs/desktop/llm-reference" className="text-primary hover:underline">LLM Reference</Link>,{' '}
+                    <Link href="/docs/ai-skill" className="text-primary hover:underline">JUA_SKILL.md</Link>, and
+                    database docs to reflect TanStack Router and CGO-free SQLite changes.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v2.0.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v2.0.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 4, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Native desktop apps (Wails)</strong> &mdash; New <code>jua new-desktop</code> command
+                    scaffolds a complete desktop application with Go backend, React frontend (Vite + TanStack Router +
+                    TanStack Query), SQLite database, JWT authentication, blog and contact CRUD, PDF/Excel export,
+                    custom title bar, dark theme, and GORM Studio. Compiles to a single native executable for
+                    Windows, macOS, and Linux. See{' '}
+                    <Link href="/docs/desktop" className="text-primary hover:underline">Desktop docs</Link>.
+                  </li>
+                  <li>
+                    <strong>Desktop resource generation</strong> &mdash; <code>jua generate resource</code> now
+                    works inside desktop projects. Generates Go model, service, and TanStack Router route files
+                    (list, new, edit), then injects code into 10 locations (db.go, main.go, app.go, types.go,
+                    sidebar.tsx, studio/main.go) using <code>jua:</code> markers. See{' '}
+                    <Link href="/docs/desktop/resource-generation" className="text-primary hover:underline">Desktop Resource Generation</Link>.
+                  </li>
+                  <li>
+                    <strong>Project type auto-detection</strong> &mdash; All CLI commands now auto-detect whether
+                    you are inside a web (Turborepo) or desktop (Wails) project. No flags needed.
+                  </li>
+                  <li>
+                    <strong><code>jua start</code> for desktop</strong> &mdash; Running <code>jua start</code>{' '}
+                    inside a desktop project launches <code>wails dev</code> with hot-reload for both Go and React.
+                  </li>
+                  <li>
+                    <strong><code>jua compile</code></strong> &mdash; New command that runs <code>wails build</code>{' '}
+                    to produce a distributable native binary.
+                  </li>
+                  <li>
+                    <strong><code>jua studio</code></strong> &mdash; New command that launches GORM Studio. For
+                    desktop projects it starts a standalone server on port 4000. For web projects it opens the
+                    browser to the embedded Studio route.
+                  </li>
+                  <li>
+                    <strong><code>jua remove resource</code> for desktop</strong> &mdash; Removes a previously
+                    generated desktop resource, deleting files and reversing all 10 marker injections.
+                  </li>
+                  <li>
+                    <strong>Jua UI component registry (91 components)</strong> &mdash; Every scaffolded web
+                    project now includes a shadcn-compatible component registry with 91 pre-built components
+                    across 5 categories: marketing (14), auth (10), SaaS (30), ecommerce (20), and layout (18).
+                    Install via <code>npx shadcn@latest add</code> from <code>/r</code> endpoints.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/desktop" className="text-primary hover:underline">Desktop (Wails)</Link>{' '}
+                    section &mdash; 8 pages covering overview, getting started, first app tutorial, POS app
+                    tutorial, resource generation, building/distribution, project ideas, and LLM reference.
+                  </li>
+                  <li>
+                    Updated{' '}
+                    <Link href="/docs/ai-skill/llm-guide" className="text-primary hover:underline">LLM Reference</Link>{' '}
+                    with complete desktop section: project structure, CLI commands, markers, and architecture comparison.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v1.4.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v1.4.0
+                </span>
+                <span className="text-sm text-muted-foreground">March 2, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Gzip response compression</strong> &mdash; All API responses are now
+                    compressed automatically via a custom <code>Gzip()</code> middleware using the Go
+                    standard library <code>compress/gzip</code> at <code>BestSpeed</code>.
+                    JSON payloads shrink by 60–80%, reducing bandwidth on paginated list endpoints
+                    with zero external dependencies.
+                  </li>
+                  <li>
+                    <strong>Request ID tracing</strong> &mdash; A <code>RequestID()</code> middleware
+                    injects a unique <code>X-Request-ID</code> header on every request (echoes the
+                    upstream header or generates a nanosecond-based ID). The ID is stored in Gin
+                    context and included in every structured log line for end-to-end request tracing.
+                  </li>
+                  <li>
+                    <strong>Database connection pool tuning</strong> &mdash; The scaffold now sets
+                    four GORM pool parameters: <code>MaxIdleConns(10)</code>,{' '}
+                    <code>MaxOpenConns(100)</code>, <code>ConnMaxLifetime(30m)</code>, and{' '}
+                    <code>ConnMaxIdleTime(10m)</code>. This prevents stale connections after network
+                    interruptions and avoids connection exhaustion under load.
+                  </li>
+                  <li>
+                    <strong>Cache-Control headers on public blog endpoints</strong> &mdash; The{' '}
+                    <code>ListPublished</code> handler now returns{' '}
+                    <code>Cache-Control: public, max-age=300</code> (5 minutes) and{' '}
+                    <code>GetBySlug</code> returns <code>Cache-Control: public, max-age=3600</code>{' '}
+                    (1 hour). CDNs and edge caches can now serve public blog content without hitting
+                    the Go API.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/concepts/performance" className="text-primary hover:underline">Performance</Link>{' '}
+                    page &mdash; comprehensive guide to all backend (Go/API) and frontend (Next.js)
+                    performance optimisations that ship with every Jua project out of the box.
+                    Covers Gzip, Request ID, connection pool, Cache-Control, presigned uploads,
+                    background jobs, Redis caching, Server Components, ISR, React Query, next/image,
+                    Turborepo, and code splitting.
+                  </li>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/ai-skill/llm-guide" className="text-primary hover:underline">Complete LLM Reference</Link>{' '}
+                    page &mdash; a dedicated machine-readable guide that teaches AI assistants
+                    everything about Jua: project structure, all CLI commands, every field type,
+                    code patterns, API response format, code markers, naming conventions, all
+                    batteries, performance features, and the golden rules that must never be broken.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v1.3.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v1.3.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 26, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Presigned URL uploads</strong> &mdash; File uploads now bypass the API server entirely.
+                    The browser gets a presigned PUT URL, uploads directly to S3/R2/MinIO, then records the upload
+                    in the database. This fixes file uploads breaking behind reverse proxies (Dokploy/Traefik/Nginx)
+                    due to request body size limits and timeouts. Includes progress tracking via XHR.
+                  </li>
+                  <li>
+                    <strong>Error pages for scaffolded apps</strong> &mdash; New <code>jua new</code> projects now include{' '}
+                    <code>error.tsx</code>, <code>not-found.tsx</code>, and <code>global-error.tsx</code> for both
+                    admin and web apps. Errors are displayed with styled UI instead of the default Next.js error page.
+                  </li>
+                  <li>
+                    <strong>Production-ready Docker config</strong> &mdash; <code>docker-compose.prod.yml</code> now uses{' '}
+                    <code>expose</code> instead of <code>ports</code>, <code>env_file</code> for secrets, MinIO service,
+                    named bridge network, build args for <code>NEXT_PUBLIC_API_URL</code>, and Go 1.24.
+                  </li>
+                  <li>
+                    <strong>Sentinel ExcludePaths</strong> &mdash; Pulse, GORM Studio, Sentinel, and API docs paths are
+                    now excluded from rate limiting by default, fixing Pulse health checks triggering rate limits.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/getting-started/create-without-docker" className="text-primary hover:underline">Create without Docker</Link>{' '}
+                    guide &mdash; set up a Jua project using Neon, Upstash, Cloudflare R2, and Resend instead of Docker.
+                  </li>
+                </ul>
+
+                <h3>Infrastructure</h3>
+                <ul>
+                  <li>
+                    Scaffold Dockerfile updated from Go 1.23 to Go 1.24
+                  </li>
+                  <li>
+                    Next.js Dockerfile now accepts <code>NEXT_PUBLIC_API_URL</code> as a build argument
+                  </li>
+                  <li>
+                    <code>.env</code> template includes Docker Compose production variables (<code>POSTGRES_USER</code>,{' '}
+                    <code>POSTGRES_PASSWORD</code>, <code>POSTGRES_DB</code>, <code>API_URL</code>)
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v1.1.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v1.1.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 25, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Default font changed to Onest</strong> &mdash; New projects scaffolded with{' '}
+                    <code>jua new</code> now use the{' '}
+                    <a href="https://fonts.google.com/specimen/Onest" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Onest</a>{' '}
+                    Google Font for all UI text instead of DM Sans. JetBrains Mono remains the code font.
+                    The font is loaded via <code>next/font/google</code> with weights 400, 500, 600, and 700.
+                  </li>
+                  <li>
+                    <strong>Hire Us page</strong> &mdash; New{' '}
+                    <Link href="/hire" className="text-primary hover:underline">/hire</Link>{' '}
+                    page for professional Jua development services. Includes service offerings,
+                    tech stack overview, and contact CTA.
+                  </li>
+                  <li>
+                    <strong>Monetization banners</strong> &mdash; Docs sidebar now shows promotional cards for{' '}
+                    <a href="https://juaframework.dev" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">JuaCMS</a>,
+                    developer hiring services, and{' '}
+                    <Link href="/donate" className="text-primary hover:underline">donations</Link>{' '}
+                    &mdash; visible on every documentation page.
+                  </li>
+                  <li>
+                    <strong>Jua Fullstack Course page</strong> &mdash; New{' '}
+                    <Link href="/course" className="text-primary hover:underline">/course</Link>{' '}
+                    page with a 10-module curriculum covering Go, React, Next.js, and the full Jua stack.
+                  </li>
+                </ul>
+
+                <h3>Improvements</h3>
+                <ul>
+                  <li>
+                    Top navigation now includes JuaCMS, Hire Us, and a Sponsor heart icon for quick access
+                    to all revenue channels.
+                  </li>
+                  <li>
+                    <code>richtext</code> added to the FieldType union for better type safety in the code generator.
+                  </li>
+                </ul>
+
+                <h3>Bug Fixes</h3>
+                <ul>
+                  <li>
+                    <strong>OAuth callback fix</strong> &mdash; Fixed <code>TokenPair</code> struct field access
+                    in the social login callback handler (was using map indexing instead of struct fields).
+                  </li>
+                  <li>
+                    <strong>Course waitlist fix</strong> &mdash; Fixed Google Sheets submission to use
+                    form-encoded data instead of JSON.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/getting-started/cli-cheatsheet" className="text-primary hover:underline">CLI Cheatsheet</Link>{' '}
+                    page &mdash; complete reference for all Jua CLI commands with flags, field types,
+                    generated files, common workflows, and full command tree.
+                  </li>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/backend/oauth" className="text-primary hover:underline">Social Login (OAuth2)</Link>{' '}
+                    setup guide for Google and GitHub authentication.
+                  </li>
+                  <li>
+                    Updated Docker Cheat Sheet with force remove commands for containers and volumes.
+                  </li>
+                  <li>
+                    Updated AI skill guide with social login (OAuth2) section.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v1.0.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v1.0.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 24, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Social Login (Google + GitHub)</strong> &mdash; Every <code>jua new</code> project now
+                    includes OAuth2 social authentication via{' '}
+                    <a href="https://github.com/markbates/goth" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Gothic</a>.
+                    Users can sign in with Google or GitHub on all auth pages (login, register, admin).
+                    Accounts are linked by email &mdash; existing users who sign in with a social provider are automatically connected.
+                    Configurable via <code>GOOGLE_CLIENT_ID</code>, <code>GITHUB_CLIENT_ID</code> environment variables.
+                  </li>
+                  <li>
+                    <strong>GORM Studio v1.0.1</strong> &mdash; Updated to the first stable tagged release of GORM Studio.
+                  </li>
+                </ul>
+
+                <h3>Improvements</h3>
+                <ul>
+                  <li>
+                    User model now includes <code>Provider</code>, <code>GoogleID</code>, and <code>GithubID</code> fields
+                    for social account linking. Password field is now nullable to support OAuth-only accounts.
+                  </li>
+                  <li>
+                    Admin users table shows Provider column with badges (Email, Google, GitHub) and new filter option.
+                  </li>
+                  <li>
+                    Social login buttons (Google + GitHub) appear on all 4 admin style variants (default, modern, minimal, glass).
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v0.19.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v0.19.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 24, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Fixes</h3>
+                <ul>
+                  <li>
+                    <strong>gin-docs AuthConfig</strong> &mdash; Updated scaffold template to use the new{' '}
+                    <code>gindocs.AuthConfig</code> struct instead of the deprecated <code>gindocs.AuthBearer</code> constant,
+                    fixing compilation errors in newly scaffolded projects.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/tutorials/contact-app" className="text-primary hover:underline">Your First App</Link>{' '}
+                    tutorial &mdash; step-by-step Contact Manager guide covering project setup, resource generation, and CRUD
+                  </li>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/deployment/dokploy" className="text-primary hover:underline">Dokploy Deployment</Link>{' '}
+                    guide with Dockerfile examples
+                  </li>
+                  <li>
+                    Improved terminal blocks across all tutorials with copy buttons and horizontal scroll
+                  </li>
+                  <li>
+                    Updated{' '}
+                    <Link href="/docs/backend/api-docs" className="text-primary hover:underline">API Documentation</Link>{' '}
+                    page to reflect the new <code>AuthConfig</code> struct format
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v0.18.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v0.18.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 22, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Pulse (Observability)</strong> &mdash; Every <code>jua new</code> project now includes{' '}
+                    <a href="https://github.com/katuramuh/pulse" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Pulse</a>,
+                    a self-hosted observability SDK. Provides request tracing, database monitoring, runtime metrics,
+                    error tracking, health checks, alerting, Prometheus export, and an embedded React dashboard
+                    at <code>/pulse</code>. Enabled by default, configurable via <code>PULSE_ENABLED</code>.
+                    See <Link href="/docs/backend/pulse" className="text-primary hover:underline">Pulse docs</Link>.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/backend/pulse" className="text-primary hover:underline">Pulse (Observability)</Link> page
+                    covering configuration, endpoints, health checks, alerting, Prometheus metrics, and data storage
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v0.17.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v0.17.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 22, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>API Documentation (gin-docs)</strong> &mdash; Replaced hand-written Scalar/OpenAPI
+                    spec with{' '}
+                    <a href="https://github.com/katuramuh/gin-docs" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">gin-docs</a>,
+                    a zero-annotation API documentation generator. Routes and GORM models are introspected
+                    automatically to produce an OpenAPI 3.1 spec with interactive Scalar or Swagger UI,
+                    plus Postman and Insomnia export.
+                  </li>
+                  <li>
+                    <strong>Dark/Light mode for Go Playground</strong> &mdash; The playground now follows the
+                    site-wide theme toggle, switching between VS Code dark and light CodeMirror themes.
+                  </li>
+                  <li>
+                    <strong>Umami Analytics</strong> &mdash; Optional visitor analytics via self-hosted Umami,
+                    configured with <code>NEXT_PUBLIC_UMAMI_WEBSITE_ID</code> environment variable.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    New{' '}
+                    <Link href="/docs/backend/api-docs" className="text-primary hover:underline">API Documentation</Link> page
+                    covering gin-docs configuration, GORM model schemas, route customization, UI switching, and spec export
+                  </li>
+                  <li>Full SEO + AEO implementation: sitemap, robots.txt, JSON-LD structured data, per-page metadata</li>
+                </ul>
+
+                <h3>Infrastructure</h3>
+                <ul>
+                  <li>Added Dockerfile for docs site deployment (Next.js standalone output)</li>
+                  <li>Google Search Console verification</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v0.16.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v0.16.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 21, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Go Playground</strong> &mdash; Interactive code editor at{' '}
+                    <Link href="/playground" className="text-primary hover:underline">/playground</Link> with
+                    Go syntax highlighting, code execution via the official Go Playground API, example snippets,
+                    share links, and keyboard shortcuts (Ctrl+Enter to run).
+                  </li>
+                  <li>
+                    <strong>GORM Studio updated</strong> &mdash; Updated to latest version with raw SQL editor,
+                    schema export (SQL/JSON/YAML/DBML/ERD), data import/export (JSON/CSV/SQL/XLSX),
+                    and Go model generation from database schema.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>
+                    <Link href="/docs/prerequisites/golang" className="text-primary hover:underline">Go for Jua Developers</Link> &mdash;
+                    comprehensive rewrite with 22 sections covering methods, Gin routing, middleware, CORS,
+                    handler/service architecture, GORM CRUD, migrations, seeding, JWT auth flow, and RBAC
+                  </li>
+                  <li>Fixed right-side table of contents for the Go prerequisites page</li>
+                  <li>New Middleware and CORS sections added to Go guide</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v0.15.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v0.15.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 20, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Security (Sentinel)</strong> &mdash; Every <code>jua new</code> project now ships with
+                    a production-grade security suite powered by{' '}
+                    <Link href="https://github.com/katuramuh/sentinel" className="text-primary hover:underline">Sentinel</Link>.
+                    Includes WAF, rate limiting, brute-force protection, anomaly detection, IP geolocation,
+                    security headers, and a real-time threat dashboard at <code>/sentinel/ui</code>.
+                    See <Link href="/docs/batteries/security" className="text-primary hover:underline">Security docs</Link>.
+                  </li>
+                  <li>
+                    <strong>Admin security page</strong> &mdash; New System &rarr; Security page in the admin panel
+                    embeds the Sentinel dashboard for monitoring threats without leaving the admin UI.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>New: <Link href="/docs/batteries/security" className="text-primary hover:underline">Security (Sentinel)</Link> documentation page</li>
+                  <li>Migrated getting-started pages (Installation, Quick Start, Troubleshooting) to use CodeBlock component</li>
+                  <li>Added prerequisite learning pages for Go, Next.js, and Docker</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v0.14.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v0.14.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 18, 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Multi-step forms</strong> &mdash; New <code>formView: &quot;modal-steps&quot;</code> and{' '}
+                    <code>&quot;page-steps&quot;</code> variants with horizontal/vertical step indicators,
+                    per-step validation, progress bar, and clickable step navigation.
+                    See <Link href="/docs/admin/multi-step-forms" className="text-primary hover:underline">Multi-Step Forms</Link>.
+                  </li>
+                  <li>
+                    <strong>Standalone component usage</strong> &mdash; FormBuilder, FormStepper, and DataTable
+                    can now be used on any page in both web and admin apps without the resource system.
+                    See <Link href="/docs/admin/standalone-usage" className="text-primary hover:underline">Standalone Usage</Link>.
+                  </li>
+                  <li>
+                    <strong>Richtext field type</strong> &mdash; New <code>richtext</code> field with Tiptap WYSIWYG
+                    editor (bold, italic, headings, lists, code blocks, links, undo/redo).
+                  </li>
+                  <li>
+                    <strong><code>string_array</code> field type</strong> &mdash; Store arrays of strings
+                    using <code>datatypes.JSONSlice[string]</code>. Works with PostgreSQL and SQLite.
+                    Maps to <code>string[]</code> in TypeScript and <code>z.array(z.string())</code> in Zod.
+                  </li>
+                  <li>
+                    <strong>Built-in blog example</strong> &mdash; <code>jua new</code> now scaffolds a complete
+                    blog with model, service, handler, seed data, public web pages, and admin resource definition.
+                  </li>
+                  <li>
+                    <strong>Sidebar user avatar</strong> &mdash; Admin sidebar shows the current user&apos;s avatar
+                    with a dropdown menu for profile and logout.
+                  </li>
+                  <li>
+                    <strong>Profile avatar upload</strong> &mdash; Profile page now supports avatar image upload.
+                  </li>
+                  <li>
+                    <strong><code>react-hook-form</code> in web app</strong> &mdash; Web app scaffold now includes{' '}
+                    <code>react-hook-form</code> as a dependency, enabling standalone FormBuilder usage out of the box.
+                  </li>
+                </ul>
+
+                <h3>Bug Fixes</h3>
+                <ul>
+                  <li>
+                    <strong>Scalar API docs crash</strong> &mdash; Fixed <code>c.String</code> treating HTML as
+                    a format string. Now uses <code>c.Data</code> to avoid panics when Scalar HTML
+                    contains <code>%</code> characters in CSS/JS.
+                  </li>
+                  <li>
+                    <strong>Blog route conflict</strong> &mdash; Admin blog CRUD routes moved
+                    from <code>/api/blogs</code> to <code>/api/admin/blogs</code> to avoid conflict
+                    with public blog routes.
+                  </li>
+                  <li>
+                    <strong>Select dropdown styling</strong> &mdash; Fixed relationship select dropdown
+                    rendering behind modals using portal-based positioning.
+                  </li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                  <li>New: <Link href="/docs/tutorials/product-catalog" className="text-primary hover:underline">Build a Product Catalog</Link> tutorial &mdash; resource generation, multi-step forms, standalone DataTable &amp; FormBuilder</li>
+                  <li>New: <Link href="/docs/admin/multi-step-forms" className="text-primary hover:underline">Multi-Step Forms</Link> guide</li>
+                  <li>New: <Link href="/docs/admin/standalone-usage" className="text-primary hover:underline">Standalone Usage</Link> guide</li>
+                  <li>New: Changelog page</li>
+                  <li>Updated CLI Commands, Code Generation, Quick Start, Resources, Shared Package, Web App, Seeders, and Forms pages</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v0.12.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v0.12.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Relationship support</strong> &mdash; New <code>belongs_to</code> and{' '}
+                    <code>many_to_many</code> field types for the code generator. Automatically creates
+                    foreign keys, junction tables, and relationship-aware form fields.
+                  </li>
+                  <li>
+                    <strong>Relationship select fields</strong> &mdash; New <code>relationship-select</code> and{' '}
+                    <code>multi-relationship-select</code> form field components with search, portal-based
+                    dropdowns, and tag-based multi-select.
+                  </li>
+                  <li>
+                    <strong>Beginner tutorial</strong> &mdash; &quot;Learn Jua Step by Step&quot; tutorial
+                    walking through building a full-stack app from scratch.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v0.11.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v0.11.0
+                </span>
+                <span className="text-sm text-muted-foreground">February 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Full-page form view</strong> &mdash; New <code>formView: &quot;page&quot;</code> option
+                    renders forms as dedicated pages instead of modals.
+                  </li>
+                  <li>
+                    <strong><code>slug</code> field type</strong> &mdash; Auto-generates URL-friendly slugs with
+                    unique suffixes. Excluded from create/update forms and Zod schemas.
+                  </li>
+                  <li>
+                    <strong>DataTable column customization</strong> &mdash; Hide/show columns, column visibility
+                    toggle in table toolbar.
+                  </li>
+                  <li>
+                    <strong><code>jua start</code> commands</strong> &mdash; <code>jua start client</code> and{' '}
+                    <code>jua start server</code> for running frontend and API separately.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* v0.10.0 */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="inline-flex items-center rounded-lg bg-muted/50 px-3 py-1 text-sm font-semibold text-muted-foreground">
+                  v0.10.0
+                </span>
+                <span className="text-sm text-muted-foreground">January 2026</span>
+              </div>
+
+              <div className="prose-jua">
+                <h3>Features</h3>
+                <ul>
+                  <li>
+                    <strong>Style variants</strong> &mdash; <code>--style</code> flag for <code>jua new</code> with
+                    4 admin panel styles: default, modern, minimal, and glass.
+                  </li>
+                  <li>
+                    <strong>Air hot reloading</strong> &mdash; Go API development with automatic rebuild on file
+                    changes using Air.
+                  </li>
+                  <li>
+                    <strong><code>jua remove resource</code></strong> &mdash; Remove a generated resource and
+                    clean up all injected code (model, handler, routes, schemas, types, hooks, admin pages).
+                  </li>
+                  <li>
+                    <strong>AI workflow docs</strong> &mdash; Guides for using Jua with Claude and Antigravity AI assistants.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Nav */}
+            <div className="flex items-center justify-between pt-6 border-t border-border/30">
+              <Button variant="ghost" size="sm" asChild className="text-muted-foreground/60 hover:text-foreground">
+                <Link href="/docs" className="gap-1.5">
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  Introduction
+                </Link>
+              </Button>
+              <div />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}

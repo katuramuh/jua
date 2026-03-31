@@ -1,0 +1,224 @@
+import Link from "next/link"
+import { Globe, Monitor, Smartphone, Clock, ArrowRight, BookOpen, Zap, Server, Dumbbell, ShoppingCart, FileText, Shield, Activity, Database, Code2, Rocket, Bot, Receipt, TestTube2, HardDrive, MessageSquare, CreditCard, Newspaper, GitBranch, Wrench, Palette } from "lucide-react"
+import { SiteHeader } from "@/components/site-header"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Jua Courses",
+  description:
+    "Free, self-paced 30-minute courses for building web, desktop, and mobile applications with the Jua framework.",
+  openGraph: {
+    title: "Jua Courses",
+    description:
+      "Free, self-paced 30-minute courses for building web, desktop, and mobile applications with the Jua framework.",
+    url: "https://juaframework.dev/courses",
+  },
+}
+
+/* -- Course category data ------------------------------------------------- */
+
+interface CourseCategory {
+  title: string
+  subtitle: string
+  icon: React.ComponentType<{ className?: string }>
+  href: string
+  courseCount: number
+  totalTime: string
+  courses: string[]
+}
+
+const categories: CourseCategory[] = [
+  {
+    title: "Jua Web",
+    subtitle: "Building Web Applications",
+    icon: Globe,
+    href: "/courses/jua-web",
+    courseCount: 9,
+    totalTime: "~4.5 hours",
+    courses: [
+      "Introduction to Jua",
+      "Your First Jua App",
+      "Code Generator Mastery",
+      "Authentication & Authorization",
+      "Admin Panel Customization",
+      "File Storage & Uploads",
+      "Background Jobs & Email",
+      "AI-Powered Features",
+      "Deploy to Production",
+    ],
+  },
+  {
+    title: "Jua Desktop",
+    subtitle: "Building Desktop Applications",
+    icon: Monitor,
+    href: "/courses/jua-desktop",
+    courseCount: 5,
+    totalTime: "~2.5 hours",
+    courses: [
+      "Your First Desktop App",
+      "Desktop CRUD & Data",
+      "Custom UI & Theming",
+      "PDF & Excel Export",
+      "Build & Distribution",
+    ],
+  },
+  {
+    title: "Jua Mobile",
+    subtitle: "Building Mobile Applications",
+    icon: Smartphone,
+    href: "/courses/jua-mobile",
+    courseCount: 5,
+    totalTime: "~2.5 hours",
+    courses: [
+      "Your First Mobile App",
+      "Mobile Auth & Navigation",
+      "API Integration & Offline",
+      "Push Notifications",
+      "Build & App Store",
+    ],
+  },
+]
+
+const standaloneCourses = [
+  { title: "Batteries Included", subtitle: "Every feature that ships with Jua", href: "/courses/batteries", icon: Zap, duration: "30 min" },
+  { title: "API-Only Masterclass", subtitle: "Build & deploy a REST API with Go", href: "/courses/api-masterclass", icon: Server, duration: "30 min" },
+  { title: "Build a Fitness App", subtitle: "Go API + Expo React Native", href: "/courses/mobile-fitness-app", icon: Dumbbell, duration: "30 min" },
+  { title: "E-commerce Store", subtitle: "Single app architecture with Vite", href: "/courses/ecommerce-spa", icon: ShoppingCart, duration: "30 min" },
+  { title: "API Docs: Scalar & Swagger", subtitle: "Auto-generated API documentation", href: "/courses/api-docs-scalar", icon: FileText, duration: "30 min" },
+  { title: "Security Deep Dive", subtitle: "Auth, 2FA, WAF & rate limiting", href: "/courses/security-deep-dive", icon: Shield, duration: "30 min" },
+  { title: "Pulse Analytics", subtitle: "Tracing, metrics & monitoring", href: "/courses/pulse-analytics", icon: Activity, duration: "30 min" },
+  { title: "GORM Studio", subtitle: "The visual database browser", href: "/courses/gorm-studio", icon: Database, duration: "30 min" },
+  { title: "React + Vite + Go", subtitle: "Building with TanStack Router", href: "/courses/react-vite-go", icon: Code2, duration: "30 min" },
+  { title: "Deployment Guide", subtitle: "Dokploy, Orbita, VPS & Vercel", href: "/courses/deployment-guide", icon: Rocket, duration: "30 min" },
+  { title: "SaaS with Claude Code", subtitle: "AI-assisted SaaS development", href: "/courses/saas-with-ai", icon: Bot, duration: "30 min" },
+  { title: "Invoice Generator", subtitle: "Desktop app with Wails + PDF export", href: "/courses/invoice-desktop", icon: Receipt, duration: "30 min" },
+  { title: "Testing Your Jua App", subtitle: "Go, Vitest & Playwright", href: "/courses/testing", icon: TestTube2, duration: "30 min" },
+  { title: "Database Mastery", subtitle: "GORM models, migrations & queries", href: "/courses/gorm-mastery", icon: HardDrive, duration: "30 min" },
+  { title: "Real-Time Chat", subtitle: "WebSockets with jua-websockets", href: "/courses/realtime-chat", icon: MessageSquare, duration: "30 min" },
+  { title: "Stripe Payments", subtitle: "Subscriptions & billing for SaaS", href: "/courses/stripe-payments", icon: CreditCard, duration: "30 min" },
+  { title: "Blog & CMS", subtitle: "Complete content management system", href: "/courses/blog-cms", icon: Newspaper, duration: "30 min" },
+  { title: "CI/CD with GitHub Actions", subtitle: "Automated testing & deployment", href: "/courses/cicd-github", icon: GitBranch, duration: "30 min" },
+  { title: "Custom Middleware", subtitle: "Extending Jua with hooks", href: "/courses/custom-middleware", icon: Wrench, duration: "30 min" },
+  { title: "Jua UI Components", subtitle: "Using the 100-component registry", href: "/courses/jua-ui-components", icon: Palette, duration: "30 min" },
+]
+
+/* -- Page component ------------------------------------------------------- */
+
+export default function CoursesPage() {
+  return (
+    <div className="min-h-screen bg-[#0b1120]">
+      <SiteHeader />
+
+      <main>
+        {/* Hero */}
+        <section className="relative overflow-hidden border-b border-border/30">
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.04] to-transparent" />
+          <div className="container max-w-screen-xl relative py-20 px-6">
+            <div className="max-w-3xl mx-auto text-center">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-xs font-mono font-medium text-primary mb-6">
+                <BookOpen className="h-3.5 w-3.5" />
+                DIY Self-Paced Courses
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-5 leading-[1.1] text-foreground">
+                Learn Jua
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                Free, self-paced <span className="text-foreground font-medium">30-minute courses</span> that teach you
+                how to build web, desktop, and mobile applications with the Jua framework.
+                Pick a track and start building.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Course categories */}
+        <section className="py-16">
+          <div className="container max-w-screen-xl px-6">
+            <div className="grid gap-6 md:grid-cols-3">
+              {categories.map((cat) => (
+                <Link
+                  key={cat.title}
+                  href={cat.href}
+                  className="group relative flex flex-col rounded-xl border border-border/40 bg-card/50 p-6 hover:border-primary/30 hover:bg-card/70 transition-all"
+                >
+                  {/* Icon + meta */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/15">
+                      <cat.icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                        {cat.title}
+                      </h2>
+                      <p className="text-xs text-muted-foreground">{cat.subtitle}</p>
+                    </div>
+                  </div>
+
+                  {/* Stats row */}
+                  <div className="flex items-center gap-4 mb-5 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <BookOpen className="h-3.5 w-3.5 text-primary/60" />
+                      {cat.courseCount} courses
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5 text-primary/60" />
+                      {cat.totalTime}
+                    </span>
+                  </div>
+
+                  {/* Mini-course list */}
+                  <ul className="flex-1 space-y-2 mb-6">
+                    {cat.courses.map((course, i) => (
+                      <li key={i} className="flex items-start gap-2.5 text-[13px] text-muted-foreground/80">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-primary/10 text-[10px] font-mono font-medium text-primary/70 mt-px">
+                          {i + 1}
+                        </span>
+                        {course}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* CTA */}
+                  <div className="flex items-center gap-1.5 text-sm font-medium text-primary group-hover:gap-2.5 transition-all">
+                    Start Learning
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Standalone Courses */}
+            <div className="mt-20">
+              <div className="text-center mb-10">
+                <h2 className="text-2xl font-bold text-foreground mb-2">Standalone Courses</h2>
+                <p className="text-muted-foreground">Deep dives, practical builds, and specialized topics</p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {standaloneCourses.map((course) => (
+                  <Link
+                    key={course.href}
+                    href={course.href}
+                    className="group flex items-start gap-3 p-4 rounded-lg border border-border/40 bg-card/30 hover:border-primary/30 hover:bg-card/50 transition-all"
+                  >
+                    <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-primary/10 text-primary shrink-0 group-hover:bg-primary/20 transition-colors">
+                      <course.icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                        {course.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">{course.subtitle}</p>
+                      <span className="text-[10px] text-muted-foreground/60 mt-1 block">{course.duration}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  )
+}
