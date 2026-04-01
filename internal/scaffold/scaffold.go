@@ -297,6 +297,30 @@ func Run(opts Options) error {
 		return fmt.Errorf("writing TOTP files: %w", err)
 	}
 
+	// Write Phase 1 provider files (SMS, Payment, WhatsApp, Email, Push, USSD)
+	spinner.Printf("  → Adding providers (SMS, Payment, WhatsApp, Email, Push, USSD)...\n")
+	if err := writeJuaProvidersSMSFiles(root, opts); err != nil {
+		return fmt.Errorf("writing SMS provider files: %w", err)
+	}
+	if err := writeJuaProvidersPaymentFiles(root, opts); err != nil {
+		return fmt.Errorf("writing payment provider files: %w", err)
+	}
+	if err := writeJuaProvidersWhatsAppFiles(root, opts); err != nil {
+		return fmt.Errorf("writing WhatsApp provider files: %w", err)
+	}
+	if err := writeJuaProvidersEmailFiles(root, opts); err != nil {
+		return fmt.Errorf("writing email provider files: %w", err)
+	}
+	if err := writeJuaProvidersPushFiles(root, opts); err != nil {
+		return fmt.Errorf("writing push provider files: %w", err)
+	}
+	if err := writeJuaProvidersUSSDFiles(root, opts); err != nil {
+		return fmt.Errorf("writing USSD provider files: %w", err)
+	}
+	if err := writeJuaProvidersConfigFiles(root, opts); err != nil {
+		return fmt.Errorf("writing providers config: %w", err)
+	}
+
 	// Write blog example files
 	spinner.Printf("  → Adding blog example...\n")
 	if err := writeAPIBlogFiles(root, opts); err != nil {
@@ -456,6 +480,30 @@ func RunSingle(opts Options) error {
 		return fmt.Errorf("writing TOTP files: %w", err)
 	}
 
+	// Write Phase 1 provider files
+	spinner.Printf("  → Adding providers (SMS, Payment, WhatsApp, Email, Push, USSD)...\n")
+	if err := writeJuaProvidersSMSFiles(root, opts); err != nil {
+		return fmt.Errorf("writing SMS provider files: %w", err)
+	}
+	if err := writeJuaProvidersPaymentFiles(root, opts); err != nil {
+		return fmt.Errorf("writing payment provider files: %w", err)
+	}
+	if err := writeJuaProvidersWhatsAppFiles(root, opts); err != nil {
+		return fmt.Errorf("writing WhatsApp provider files: %w", err)
+	}
+	if err := writeJuaProvidersEmailFiles(root, opts); err != nil {
+		return fmt.Errorf("writing email provider files: %w", err)
+	}
+	if err := writeJuaProvidersPushFiles(root, opts); err != nil {
+		return fmt.Errorf("writing push provider files: %w", err)
+	}
+	if err := writeJuaProvidersUSSDFiles(root, opts); err != nil {
+		return fmt.Errorf("writing USSD provider files: %w", err)
+	}
+	if err := writeJuaProvidersConfigFiles(root, opts); err != nil {
+		return fmt.Errorf("writing providers config: %w", err)
+	}
+
 	// Write blog example
 	spinner.Printf("  → Adding blog example...\n")
 	if err := writeAPIBlogFiles(root, opts); err != nil {
@@ -548,6 +596,13 @@ func createDirectories(root string, opts Options) error {
 		filepath.Join(root, "apps", "api", "internal", "cache"),
 		filepath.Join(root, "apps", "api", "internal", "ai"),
 		filepath.Join(root, "apps", "api", "internal", "docs"),
+		// Phase 1: Provider interfaces
+		filepath.Join(root, "apps", "api", "internal", "providers", "sms"),
+		filepath.Join(root, "apps", "api", "internal", "providers", "payment"),
+		filepath.Join(root, "apps", "api", "internal", "providers", "whatsapp"),
+		filepath.Join(root, "apps", "api", "internal", "providers", "email"),
+		filepath.Join(root, "apps", "api", "internal", "providers", "push"),
+		filepath.Join(root, "apps", "api", "internal", "providers", "ussd"),
 	}
 
 	if opts.ShouldIncludeWeb() {
