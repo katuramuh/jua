@@ -11,7 +11,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
-	"github.com/katuramuh/jua/v3/internal/deploy"
 	"github.com/katuramuh/jua/v3/internal/generate"
 	"github.com/katuramuh/jua/v3/internal/maintenance"
 	"github.com/katuramuh/jua/v3/internal/project"
@@ -46,7 +45,15 @@ func main() {
 	rootCmd.AddCommand(routesCmd())
 	rootCmd.AddCommand(downCmd())
 	rootCmd.AddCommand(upCmd())
-	rootCmd.AddCommand(deployCmd())
+	rootCmd.AddCommand(newDeployCmd())
+	rootCmd.AddCommand(rollbackCmd())
+	rootCmd.AddCommand(deployStatusCmd())
+	rootCmd.AddCommand(logsCmd())
+	rootCmd.AddCommand(envCmd())
+	rootCmd.AddCommand(scaleCmd())
+	rootCmd.AddCommand(sshDeployCmd())
+	rootCmd.AddCommand(runDeployCmd())
+	rootCmd.AddCommand(openCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -1013,74 +1020,4 @@ func upCmd() *cobra.Command {
 	}
 }
 
-// ── jua deploy ──────────────────────────────────────────────────────────────
-
-func deployCmd() *cobra.Command {
-	var host, port, keyFile, domain, appPort string
-
-	cmd := &cobra.Command{
-		Use:   "deploy",
-		Short: "Deploy application to a remote server",
-		Long:  "Build the application, upload via SSH, configure systemd service, and optionally set up Caddy reverse proxy with auto-TLS.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			printLogo()
-
-			// Try to detect app name from go.mod or jua.config
-			appName := "jua-app"
-			if data, err := os.ReadFile("go.mod"); err == nil {
-				for _, line := range strings.Split(string(data), "\n") {
-					if strings.HasPrefix(line, "module ") {
-						parts := strings.Fields(line)
-						if len(parts) >= 2 {
-							appName = filepath.Base(parts[1])
-						}
-						break
-					}
-				}
-			}
-
-			// Fall back to env vars if flags not set
-			if host == "" {
-				host = os.Getenv("DEPLOY_HOST")
-			}
-			if keyFile == "" {
-				keyFile = os.Getenv("DEPLOY_KEY_FILE")
-			}
-			if domain == "" {
-				domain = os.Getenv("DEPLOY_DOMAIN")
-			}
-
-			cfg := deploy.Config{
-				Host:    host,
-				Port:    port,
-				KeyFile: keyFile,
-				AppName: appName,
-				Domain:  domain,
-				AppPort: appPort,
-			}
-
-			purple := color.New(color.FgHiMagenta, color.Bold)
-			purple.Printf("\n  Deploying %s to %s\n\n", appName, host)
-
-			if err := deploy.Run(cfg); err != nil {
-				color.Red("\n  Deploy failed: %v\n", err)
-				return err
-			}
-
-			green := color.New(color.FgHiGreen, color.Bold)
-			green.Println("\n  Deployment successful!")
-			if domain != "" {
-				color.New(color.FgHiBlack).Printf("  Live at: https://%s\n\n", domain)
-			}
-			return nil
-		},
-	}
-
-	cmd.Flags().StringVar(&host, "host", "", "SSH host (e.g. user@server.com) or DEPLOY_HOST env var")
-	cmd.Flags().StringVar(&port, "port", "22", "SSH port")
-	cmd.Flags().StringVar(&keyFile, "key", "", "Path to SSH private key or DEPLOY_KEY_FILE env var")
-	cmd.Flags().StringVar(&domain, "domain", "", "Domain for Caddy reverse proxy or DEPLOY_DOMAIN env var")
-	cmd.Flags().StringVar(&appPort, "app-port", "8080", "Port the app runs on")
-
-	return cmd
-}
+// deploy commands are defined in deploy_commands.go

@@ -37,6 +37,38 @@ docker compose up -d
 jua dev
 ```
 
+## Deploy
+
+Deploy your Jua app with one command:
+
+```bash
+# First time — provision a fresh VPS
+jua deploy setup
+
+# Every deploy after that
+jua deploy
+
+# Other commands
+jua status              # check service health
+jua logs                # view live logs
+jua rollback --version v1.0.0
+jua env push            # sync environment variables
+jua ssh                 # open server shell
+```
+
+### Supported Providers
+
+| Provider | `jua.yaml` value | Notes |
+|----------|-----------------|-------|
+| Any Linux VPS | `vps` | Ubuntu 22.04/24.04, Debian 12 |
+| Dokploy | `dokploy` | Self-hosted PaaS |
+| Coolify | `coolify` | Self-hosted PaaS |
+| Railway | `railway` | Managed cloud |
+| Render | `render` | Managed cloud |
+| Fly.io | `fly` | Edge cloud — `jnb` region for Africa |
+
+See [docs/deploy/](docs/deploy/) for provider-specific guides.
+
 ---
 
 ## What You Get

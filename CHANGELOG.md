@@ -6,6 +6,31 @@ Versioning follows [Semantic Versioning](https://semver.org)
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-01
+
+### Added
+- `jua deploy` — one-command deployment to any provider (VPS, Dokploy, Coolify, Railway, Render, Fly.io)
+- `jua deploy setup` — automated fresh VPS provisioning (Docker, Traefik, UFW, Let's Encrypt SSL)
+- `jua rollback --version vX.Y.Z` — instant rollback to any previous version
+- `jua status` — service health dashboard (name, status, health, URL)
+- `jua logs [service] [--follow]` — live log streaming
+- `jua env push/pull/list/set` — remote environment variable management
+- `jua scale SERVICE --replicas N` — service replica scaling
+- `jua ssh` — direct SSH session to deployment server
+- `jua run COMMAND` — execute commands on the remote server
+- `jua open [service]` — open deployed app in browser
+- `internal/deploy/config.go` — `JuaConfig` struct + `LoadConfig()` for `jua.yaml`
+- `internal/deploy/config_writer.go` — `WriteDefaultConfig()` generates `jua.yaml` on `jua new`
+- `internal/deploy/progress.go` — colored terminal progress reporter
+- `internal/deploy/health.go` — concurrent HTTP health checker
+- `internal/deploy/builder.go` — Docker image builder/pusher
+- `internal/deploy/traefik.go` — Traefik v3 config generator (standard + wildcard SSL)
+- `internal/deploy/providers/` — provider abstraction layer (interface + 6 implementations)
+- Zero-downtime rolling deployments with automatic rollback on health check failure
+- Traefik v3 reverse proxy with automatic Let's Encrypt SSL
+- Wildcard SSL support for multi-tenant subdomain routing (via Cloudflare DNS challenge)
+- `docs/deploy/` — provider-specific deployment guides (VPS, Dokploy, Railway, Render, Fly.io, troubleshooting)
+
 ## [0.1.0] - 2026-04-01
 
 ### Added
