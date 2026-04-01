@@ -242,8 +242,64 @@ func generateCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(generateResourceCmd())
+	cmd.AddCommand(generateAgentsCmd())
 
 	return cmd
+}
+
+func generateAgentsCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "agents",
+		Short: "Generate AGENTS.md — context file for AI coding agents",
+		Long: `Generate an AGENTS.md file at the project root.
+
+AGENTS.md gives AI coding agents (Claude Code, Cursor, GitHub Copilot, etc.)
+full context about the project architecture, conventions, tech stack, and
+common development tasks — so they can contribute effectively without
+reading every file first.
+
+Run this command again to refresh AGENTS.md after major project changes.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			printLogo()
+
+			purple := color.New(color.FgHiMagenta, color.Bold)
+			purple.Printf("\n  Generating AGENTS.md...\n\n")
+
+			info, err := project.DetectProject()
+			if err != nil {
+				return fmt.Errorf("generating agents: %w", err)
+			}
+
+			// Derive scaffold options from the detected project
+			opts := scaffold.Options{
+				ProjectName: filepath.Base(info.Root),
+			}
+			switch info.Type {
+			case project.ProjectDesktop:
+				opts.Architecture = scaffold.ArchSingle
+			default:
+				// Detect triple vs double vs api from directory presence
+				if _, err := os.Stat(filepath.Join(info.Root, "apps", "admin")); err == nil {
+					opts.Architecture = scaffold.ArchTriple
+				} else if _, err := os.Stat(filepath.Join(info.Root, "apps", "web")); err == nil {
+					opts.Architecture = scaffold.ArchDouble
+				} else {
+					opts.Architecture = scaffold.ArchAPI
+				}
+			}
+			opts.Normalize()
+
+			if err := scaffold.WriteAgentsMD(info.Root, opts); err != nil {
+				return fmt.Errorf("generating agents: %w", err)
+			}
+
+			green := color.New(color.FgGreen, color.Bold)
+			green.Printf("  ✓ AGENTS.md written to %s\n\n", filepath.Join(info.Root, "AGENTS.md"))
+			fmt.Println("  Give this file to your AI agent to get full project context.")
+			fmt.Println("  Refresh it anytime with: jua generate agents")
+			return nil
+		},
+	}
 }
 
 func removeCmd() *cobra.Command {
