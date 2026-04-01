@@ -315,6 +315,12 @@ func Run(opts Options) error {
 		return fmt.Errorf("writing USSD engine files: %w", err)
 	}
 
+	// Write Phase 5: Webhooks
+	spinner.Printf("  → Adding webhook system...\n")
+	if err := writeJuaWebhooksFiles(root, opts); err != nil {
+		return fmt.Errorf("writing webhooks files: %w", err)
+	}
+
 	// Write Phase 1 provider files (SMS, Payment, WhatsApp, Email, Push, USSD)
 	spinner.Printf("  → Adding providers (SMS, Payment, WhatsApp, Email, Push, USSD)...\n")
 	if err := writeJuaProvidersSMSFiles(root, opts); err != nil {
@@ -516,6 +522,12 @@ func RunSingle(opts Options) error {
 		return fmt.Errorf("writing USSD engine files: %w", err)
 	}
 
+	// Write Phase 5: Webhooks
+	spinner.Printf("  → Adding webhook system...\n")
+	if err := writeJuaWebhooksFiles(root, opts); err != nil {
+		return fmt.Errorf("writing webhooks files: %w", err)
+	}
+
 	// Write Phase 1 provider files
 	spinner.Printf("  → Adding providers (SMS, Payment, WhatsApp, Email, Push, USSD)...\n")
 	if err := writeJuaProvidersSMSFiles(root, opts); err != nil {
@@ -636,6 +648,7 @@ func createDirectories(root string, opts Options) error {
 		filepath.Join(root, "apps", "api", "internal", "tenancy"),
 		filepath.Join(root, "apps", "api", "internal", "auth", "phone"),
 		filepath.Join(root, "apps", "api", "internal", "ussd"),
+		filepath.Join(root, "apps", "api", "internal", "webhooks"),
 		filepath.Join(root, "apps", "api", "internal", "providers", "sms"),
 		filepath.Join(root, "apps", "api", "internal", "providers", "payment"),
 		filepath.Join(root, "apps", "api", "internal", "providers", "whatsapp"),
