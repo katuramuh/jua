@@ -297,6 +297,12 @@ func Run(opts Options) error {
 		return fmt.Errorf("writing TOTP files: %w", err)
 	}
 
+	// Write Phase 2: Multi-tenancy
+	spinner.Printf("  → Adding multi-tenancy...\n")
+	if err := writeJuaMultitenancyFiles(root, opts); err != nil {
+		return fmt.Errorf("writing multitenancy files: %w", err)
+	}
+
 	// Write Phase 1 provider files (SMS, Payment, WhatsApp, Email, Push, USSD)
 	spinner.Printf("  → Adding providers (SMS, Payment, WhatsApp, Email, Push, USSD)...\n")
 	if err := writeJuaProvidersSMSFiles(root, opts); err != nil {
@@ -480,6 +486,12 @@ func RunSingle(opts Options) error {
 		return fmt.Errorf("writing TOTP files: %w", err)
 	}
 
+	// Write Phase 2: Multi-tenancy
+	spinner.Printf("  → Adding multi-tenancy...\n")
+	if err := writeJuaMultitenancyFiles(root, opts); err != nil {
+		return fmt.Errorf("writing multitenancy files: %w", err)
+	}
+
 	// Write Phase 1 provider files
 	spinner.Printf("  → Adding providers (SMS, Payment, WhatsApp, Email, Push, USSD)...\n")
 	if err := writeJuaProvidersSMSFiles(root, opts); err != nil {
@@ -597,6 +609,7 @@ func createDirectories(root string, opts Options) error {
 		filepath.Join(root, "apps", "api", "internal", "ai"),
 		filepath.Join(root, "apps", "api", "internal", "docs"),
 		// Phase 1: Provider interfaces
+		filepath.Join(root, "apps", "api", "internal", "tenancy"),
 		filepath.Join(root, "apps", "api", "internal", "providers", "sms"),
 		filepath.Join(root, "apps", "api", "internal", "providers", "payment"),
 		filepath.Join(root, "apps", "api", "internal", "providers", "whatsapp"),
