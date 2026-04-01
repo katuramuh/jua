@@ -321,6 +321,14 @@ func Run(opts Options) error {
 		return fmt.Errorf("writing webhooks files: %w", err)
 	}
 
+	// Write Phase 6: PWA
+	if opts.ShouldIncludeWeb() {
+		spinner.Printf("  → Adding PWA configuration...\n")
+		if err := writeJuaPWAFiles(root, opts); err != nil {
+			return fmt.Errorf("writing PWA files: %w", err)
+		}
+	}
+
 	// Write Phase 1 provider files (SMS, Payment, WhatsApp, Email, Push, USSD)
 	spinner.Printf("  → Adding providers (SMS, Payment, WhatsApp, Email, Push, USSD)...\n")
 	if err := writeJuaProvidersSMSFiles(root, opts); err != nil {
@@ -526,6 +534,12 @@ func RunSingle(opts Options) error {
 	spinner.Printf("  → Adding webhook system...\n")
 	if err := writeJuaWebhooksFiles(root, opts); err != nil {
 		return fmt.Errorf("writing webhooks files: %w", err)
+	}
+
+	// Write Phase 6: PWA (single app has its own frontend)
+	spinner.Printf("  → Adding PWA configuration...\n")
+	if err := writeJuaPWAFiles(root, opts); err != nil {
+		return fmt.Errorf("writing PWA files: %w", err)
 	}
 
 	// Write Phase 1 provider files
