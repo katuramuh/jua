@@ -2,6 +2,11 @@
 
 **Go + React. Built for Africa.**
 
+![Release](https://img.shields.io/github/v/release/katuramuh/jua)
+![Build](https://img.shields.io/github/actions/workflow/status/katuramuh/jua/ci.yml)
+![License](https://img.shields.io/github/license/katuramuh/jua)
+![Go Version](https://img.shields.io/github/go-mod/go-version/katuramuh/jua)
+
 Jua is a batteries-included full-stack framework for CRMs, admin dashboards, SaaS products, and internal tools. Go performance on the backend. React on the frontend. Built with African developers in mind.
 
 > **Jua** means *sun* in Swahili — representing clarity, energy, and the rising African tech ecosystem.
@@ -10,15 +15,25 @@ Jua is a batteries-included full-stack framework for CRMs, admin dashboards, Saa
 
 ## Install
 
+### CLI (recommended)
 ```bash
-go install github.com/katuramuh/jua/cmd/jua@latest
+go install github.com/katuramuh/jua/v3/cmd/jua@latest
 ```
+
+### Docker
+```bash
+docker pull ghcr.io/katuramuh/jua:latest
+```
+
+### Download Binary
+Download the latest binary for your platform from the [Releases page](https://github.com/katuramuh/jua/releases).
 
 ## Quick Start
 
 ```bash
 jua new myapp
 cd myapp
+docker compose up -d
 jua dev
 ```
 
@@ -86,6 +101,22 @@ jua deploy                # Deploy to server
 
 ---
 
+## Supported Providers
+
+| Category | Providers |
+|---|---|
+| SMS | AfricasTalking, Relworx, eSMS Africa, Twilio, Vonage, Custom |
+| Mobile Money | MTN MoMo, Airtel Money, Flutterwave, Paystack, PawaPay, Custom |
+| International Payments | Stripe, Flutterwave |
+| WhatsApp | AfricasTalking, Twilio, Meta Cloud API, Custom |
+| Email | Resend, SMTP, Custom |
+| Push Notifications | Firebase FCM, OneSignal |
+| USSD | AfricasTalking, Yo! Uganda, Custom HTTP |
+
+Adding a new provider? See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -99,6 +130,20 @@ jua deploy                # Deploy to server
 | Docs | Scalar / OpenAPI |
 | Desktop | Wails |
 | Mobile | Expo |
+
+---
+
+## Contributing
+
+Jua is open source under the MIT license. Contributions welcome.
+
+### Adding a New Provider
+1. Implement the interface in `apps/api/providers/{category}/`
+2. Register it in the category registry file
+3. Add env variables to `.env.example`
+4. Submit a pull request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 ---
 

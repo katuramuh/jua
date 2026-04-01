@@ -17,11 +17,17 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "1.22"
           cache: true
 
       - name: Install dependencies
         run: go mod download
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
 
       - name: Run tests
         run: go test ./... -v -race -count=1
@@ -35,25 +41,16 @@ jobs:
           file: coverage.out
           fail_ci_if_error: false
 
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.24"
-          cache: true
-
-      - name: Build CLI
-        run: go build -o jua ./cmd/jua
-
-      - name: Verify binary
-        run: ./jua --help
+      - name: Check for old branding
+        run: |
+          if grep -r "MUKE-coder\|JB Web\|gritframework\|desishub" . \
+               --exclude-dir=".git" \
+               --include="*.go" --include="*.ts" --include="*.tsx" \
+               --include="*.md" --include="*.json"; then
+            echo "ERROR: old branding strings found — remove them before merging"
+            exit 1
+          fi
+          echo "Brand check passed."
 
   build-matrix:
     name: Cross-platform build
@@ -84,7 +81,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "1.22"
           cache: true
 
       - name: Build

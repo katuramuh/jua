@@ -19,7 +19,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: "1.22"
           cache: true
 
       - name: Run tests
@@ -30,13 +30,14 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/}
           LDFLAGS="-s -w -X main.Version=${VERSION}"
 
+          mkdir -p dist
+
           GOOS=linux   GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-linux-amd64   ./cmd/jua
           GOOS=linux   GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-linux-arm64   ./cmd/jua
           GOOS=darwin  GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-darwin-amd64  ./cmd/jua
           GOOS=darwin  GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-darwin-arm64  ./cmd/jua
           GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="$LDFLAGS" -o dist/jua-windows-amd64.exe ./cmd/jua
 
-          # Create tarballs for unix, zip for windows
           cd dist
           tar czf jua-linux-amd64.tar.gz  jua-linux-amd64
           tar czf jua-linux-arm64.tar.gz  jua-linux-arm64
@@ -56,5 +57,31 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-beta') || contains(github.ref, '-alpha') }}
+          body: |
+            ## Install
+
+            ### Via Go (recommended)
+            ```bash
+            go install github.com/katuramuh/jua/v3/cmd/jua@${{ github.ref_name }}
+            ```
+
+            ### Direct Download
+            Download the binary for your platform from the assets below, then add it to your PATH.
+
+            | Platform | File |
+            |---|---|
+            | Linux AMD64 | `jua-linux-amd64.tar.gz` |
+            | Linux ARM64 (VPS / Raspberry Pi) | `jua-linux-arm64.tar.gz` |
+            | macOS Intel | `jua-darwin-amd64.tar.gz` |
+            | macOS Apple Silicon | `jua-darwin-arm64.tar.gz` |
+            | Windows | `jua-windows-amd64.zip` |
+
+            ### Quick Start
+            ```bash
+            jua new myapp
+            cd myapp
+            docker compose up -d
+            jua dev
+            ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
