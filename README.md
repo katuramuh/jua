@@ -108,12 +108,13 @@ myapp/
 ## CLI Commands
 
 ```bash
-jua new <name>           # Scaffold a new Jua project
-jua generate model <name> # Generate a model + handler + service
-jua generate page <name>  # Generate a frontend page
-jua dev                   # Start dev server (Go + Next.js)
-jua build                 # Build for production
-jua deploy                # Deploy to server
+jua new <name>                         # Scaffold a new Jua project
+jua generate model <name>              # Generate a model + handler + service
+jua generate page <name>               # Generate a frontend page
+jua generate notification <Name>       # Generate a notification template
+jua dev                                # Start dev server (Go + Next.js)
+jua build                              # Build for production
+jua deploy                             # Deploy to server
 ```
 
 ---
@@ -124,7 +125,8 @@ jua deploy                # Deploy to server
 - Admin panel with drag-and-drop resource builder
 - Role-based access control (RBAC)
 - Multi-tenant SaaS support
-- Real-time via WebSockets
+- Real-time engine — SSE + WebSocket + multi-tenant event bus
+- Notifications centre — SMS, Email, Push, WhatsApp, In-App with user preferences
 - Caching with Redis
 - Background jobs with retry logic
 - OpenAPI 3.0 documentation
@@ -146,6 +148,72 @@ jua deploy                # Deploy to server
 | USSD | AfricasTalking, Yo! Uganda, Custom HTTP |
 
 Adding a new provider? See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## Real-time Engine
+
+Every Jua project ships with a production-ready real-time layer:
+
+- **Event bus** — in-memory (single instance) or Redis Pub/Sub (multi-instance)
+- **SSE** — primary push channel, works over HTTP/1.1, auto-reconnects with missed-event replay
+- **WebSocket** — bidirectional channel for collaborative features and chat
+- **React SDK** — `RealtimeProvider`, `useRealtime()`, `useSSE()`, `useWebSocket()`, `ConnectionStatus`
+
+```go
+// Publish an event from anywhere in your API
+events.Publish(events.PaymentCompleted, tenantID, map[string]interface{}{
+    "amount": 5000,
+})
+
+// Publish to a specific user
+events.PublishForUser(events.OrderUpdated, tenantID, userID, payload)
+```
+
+```tsx
+// Subscribe in React
+const { on } = useRealtime();
+useEffect(() => on("payment.completed", (e) => setBalance(e.payload.balance)), []);
+```
+
+Configure with `REALTIME_BUS=redis` for multi-instance deployments.
+
+---
+
+## Notifications Centre
+
+Multi-channel notification delivery with per-user preferences:
+
+| Channel | Opt-out | Quiet hours |
+|---------|---------|-------------|
+| In-App | Operational/Marketing only | Respected |
+| SMS | Operational/Marketing only | Respected |
+| Email | Operational/Marketing only | Respected |
+| Push | Operational/Marketing only | Respected |
+| WhatsApp | Always opt-in | Respected |
+
+Transactional and Security notifications bypass quiet hours and cannot be opted out.
+
+```go
+notifications.GlobalEngine.Send(ctx, notifications.Notification{
+    TenantID:     tenantID,
+    UserID:       userID,
+    Type:         notifications.Transactional,
+    TemplateName: "payment_received",
+    Data: map[string]interface{}{
+        "amount": "UGX 5,000", "name": "Alice",
+    },
+    Phone: "+256771234567",
+    Email: "alice@example.com",
+})
+```
+
+9 built-in templates: `payment_received`, `payment_failed`, `otp_verification`, `subscription_activated`, `subscription_expiring`, `subscription_expired`, `login_new_device`, `welcome`, `password_reset`.
+
+Generate a custom template:
+```bash
+jua generate notification OrderShipped --type transactional --channels "sms,email,inapp"
+```
 
 ---
 

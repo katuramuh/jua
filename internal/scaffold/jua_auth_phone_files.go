@@ -260,6 +260,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	// Jua events — fire domain events for real-time + notifications
+	"{{MODULE}}/jua/events"
 )
 
 // Handler provides HTTP endpoints for phone OTP authentication.
@@ -352,6 +355,9 @@ func (h *Handler) VerifyOTP(c *gin.Context) {
 		c.JSON(code, gin.H{"error": gin.H{"code": errCode, "message": msg}})
 		return
 	}
+
+	// Jua events: fire login event for real-time + security notifications
+	events.Publish(events.UserLoggedIn, "", map[string]interface{}{"phone": input.Phone})
 
 	// OTP verified — issue JWT
 	// TODO: look up or create the user by phone number in your users table,

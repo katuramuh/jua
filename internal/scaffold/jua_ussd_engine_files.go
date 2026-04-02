@@ -35,6 +35,8 @@ import (
 	"log"
 
 	"{{MODULE}}/internal/providers/ussd"
+	// Jua events — fire session completion event
+	"{{MODULE}}/jua/events"
 )
 
 // App is the USSD application engine.
@@ -102,6 +104,12 @@ func (a *App) Dispatch(ctx context.Context, params map[string]string) string {
 		if err := a.store.Delete(ctx, req.SessionID); err != nil {
 			log.Printf("ussd: delete session %s error: %v", req.SessionID, err)
 		}
+		// Jua events: session ended — fire for real-time dashboards and notifications
+		events.Publish(events.USSDSessionCompleted, "", map[string]interface{}{
+			"session_id":   req.SessionID,
+			"phone":        req.Phone,
+			"service_code": req.ServiceCode,
+		})
 	}
 
 	return a.provider.FormatResponse(resp)

@@ -391,6 +391,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+
+	// Jua events — fire domain events for real-time + notifications
+	"{{MODULE}}/jua/events"
 )
 
 // Handler provides HTTP endpoints for billing management.
@@ -489,6 +492,11 @@ func (h *Handler) Subscribe(c *gin.Context) {
 		c.JSON(code, gin.H{"error": gin.H{"code": errCode, "message": err.Error()}})
 		return
 	}
+	// Jua events: notify real-time + notification engine on subscription activation
+	events.Publish(events.SubscriptionActivated, "", map[string]interface{}{
+		"plan_id": body.PlanID,
+		"user_id": ownerID(c),
+	})
 	c.JSON(http.StatusCreated, gin.H{"data": sub, "message": "Subscription created"})
 }
 
@@ -498,6 +506,8 @@ func (h *Handler) CancelSubscription(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "CANCEL_FAILED", "message": err.Error()}})
 		return
 	}
+	// Jua events: fire cancellation event
+	events.Publish(events.SubscriptionCancelled, "", map[string]interface{}{"user_id": ownerID(c)})
 	c.JSON(http.StatusOK, gin.H{"message": "Subscription will be cancelled at the end of the current period"})
 }
 

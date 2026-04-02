@@ -65,7 +65,9 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/sessions v1.4.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/hibiken/asynq v0.24.1
 	github.com/markbates/goth v1.80.0
 	github.com/joho/godotenv v1.5.1
@@ -157,6 +159,11 @@ import (
 	"` + "{{MODULE}}" + `/internal/mail"
 	"` + "{{MODULE}}" + `/internal/routes"
 	"` + "{{MODULE}}" + `/internal/storage"
+
+	// Jua real-time engine
+	juaevents "` + "{{MODULE}}" + `/jua/events"
+	juarealtime "` + "{{MODULE}}" + `/jua/realtime"
+	juanotif "` + "{{MODULE}}" + `/jua/notifications"
 )
 
 func main() {
@@ -171,6 +178,19 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
+
+	// ── Jua Real-time Engine ─────────────────────────────────────
+	// Initialise the event bus (Redis if available, memory fallback)
+	juaevents.Init(cfg.RedisURL)
+	// Start the real-time connection hub
+	juarealtime.Init(juaevents.DefaultBus)
+	// Run notification table migrations
+	if err := juanotif.Migrate(db); err != nil {
+		log.Printf("Warning: notifications migration: %v", err)
+	}
+	// Register built-in notification templates
+	juanotif.RegisterBuiltins()
+	log.Println("Jua real-time engine started")
 
 	// ── Phase 4 Services ─────────────────────────────────────────
 
@@ -2090,6 +2110,10 @@ import (
 	"` + "{{MODULE}}" + `/internal/jobs"
 	"` + "{{MODULE}}" + `/internal/services"
 	"` + "{{MODULE}}" + `/internal/storage"
+
+	// Jua real-time + notifications routes
+	juarealtime "` + "{{MODULE}}" + `/jua/realtime"
+	juanotif "` + "{{MODULE}}" + `/jua/notifications"
 )
 
 // Services holds all Phase 4 services for dependency injection.
@@ -2369,6 +2393,12 @@ func Setup(db *gorm.DB, cfg *config.Config, svc *Services) *gin.Engine {
 
 	// Custom role-restricted routes
 	// jua:routes:custom
+
+	// Jua real-time routes (SSE + WebSocket + stats)
+	juarealtime.RegisterRoutes(r, db, authService, juarealtime.GlobalHub)
+
+	// Jua notifications routes (user prefs, read/unread, push tokens, admin broadcast)
+	juanotif.RegisterRoutes(r, db, authService)
 
 	return r
 }

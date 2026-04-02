@@ -335,6 +335,23 @@ func Run(opts Options) error {
 		return fmt.Errorf("writing billing files: %w", err)
 	}
 
+	// Write Phase 8: Real-time engine (event bus + SSE + WebSocket hub)
+	spinner.Printf("  → Adding real-time engine (event bus, SSE, WebSocket)...\n")
+	if err := writeJuaRealtimeFiles(root, opts); err != nil {
+		return fmt.Errorf("writing real-time files: %w", err)
+	}
+
+	// Write Phase 9: Notifications centre (SMS/Email/Push/WhatsApp/InApp)
+	spinner.Printf("  → Adding notifications centre...\n")
+	if err := writeJuaNotificationsFiles(root, opts); err != nil {
+		return fmt.Errorf("writing notifications files: %w", err)
+	}
+
+	// Write Phase 9 admin: real-time + notifications admin dashboard pages
+	if err := writeJuaNotificationsAdminFiles(root, opts); err != nil {
+		return fmt.Errorf("writing notifications admin files: %w", err)
+	}
+
 	// Write Phase 1 provider files (SMS, Payment, WhatsApp, Email, Push, USSD)
 	spinner.Printf("  → Adding providers (SMS, Payment, WhatsApp, Email, Push, USSD)...\n")
 	if err := writeJuaProvidersSMSFiles(root, opts); err != nil {

@@ -150,6 +150,9 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+
+	// Jua events — broadcast webhook triggers to real-time engine
+	"{{MODULE}}/jua/events"
 )
 
 // Dispatcher handles async webhook delivery with exponential backoff retries.
@@ -211,6 +214,12 @@ func (d *Dispatcher) Trigger(ctx context.Context, ownerID uint, eventName string
 			log.Printf("webhooks: create event: %v", err)
 			continue
 		}
+
+		// Jua events: publish to real-time engine so dashboards see it instantly
+		events.PublishCustom(eventName, fmt.Sprintf("%d", ownerID), map[string]interface{}{
+			"webhook_id": hook.ID,
+			"event":      eventName,
+		})
 
 		// Deliver asynchronously
 		go d.deliver(context.Background(), hook, event)

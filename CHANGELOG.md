@@ -6,6 +6,54 @@ Versioning follows [Semantic Versioning](https://semver.org)
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-02
+
+### Added
+
+#### Real-time Engine
+- Event bus with in-memory (single-instance) and Redis Pub/Sub (multi-instance) backends
+- `events.Publish()`, `events.PublishForUser()`, `events.PublishToChannel()`, `events.PublishCustom()` global helpers
+- Built-in event type constants: `PaymentCompleted`, `PaymentFailed`, `SubscriptionActivated`, `SubscriptionCancelled`, `UserLoggedIn`, `USSDSessionCompleted`, `NotificationNew`, `OrderUpdated`
+- Real-time hub with actor-model fan-out (byTenant / byUser / byChannel / all indexes, zero-lock hot path)
+- SSE handler (`GET /api/realtime/stream`) with missed-event replay via Redis sorted set and 30s keepalive
+- WebSocket handler (`GET /api/realtime/ws`) with subscribe/unsubscribe/ping/custom_event client messages
+- JWT authentication via `?token=` query param for browser SSE/WS connections
+- `GET /api/realtime/stats` endpoint for admin connection monitoring
+- Frontend SDK: `RealtimeProvider`, `useRealtime()`, `useSSE()`, `useWebSocket()`, `ConnectionStatus`
+- Admin panel real-time dashboard page with live connection stats and event log
+- `REALTIME_BUS`, `REALTIME_MAX_CONNECTIONS`, `REALTIME_EVENT_TTL` env vars added to generated `.env.example`
+- `github.com/gorilla/websocket v1.5.3` added to generated project's `go.mod`
+
+#### Notifications Centre
+- `Engine.Send()` — multi-channel delivery orchestrator with quiet-hours check and delivery logging
+- Five delivery channels: SMS, Email, Push, WhatsApp, In-App
+- Notification types with channel rules: Transactional (always delivers, bypasses quiet hours), Security (all channels, bypasses quiet hours), Operational and Marketing (user preferences, quiet hours respected)
+- Per-user `NotificationPreferences` with channel toggles, quiet hours (timezone-aware, midnight crossover), and marketing opt-in
+- GORM models: `NotificationRecord`, `NotificationLogRecord`, `PushToken`, `NotificationPreferences` (all `jua_`-prefixed tables)
+- 9 built-in notification templates: `payment_received`, `payment_failed`, `otp_verification`, `subscription_activated`, `subscription_expiring`, `subscription_expired`, `login_new_device`, `welcome`, `password_reset`
+- Template registry with `{{variable}}` substitution
+- In-app delivery via event bus → SSE/WS (real-time bell update)
+- 9 user endpoints and 4 admin endpoints for notifications management
+- Unread count cached in Redis (`jua:notif:unread:{tenantID}:{userID}`)
+- Frontend: `NotificationBell` dropdown, `NotificationPreferences` settings page, `useNotifications()` hook
+- Admin panel notifications dashboard with stats cards, broadcast form, and delivery log
+- `github.com/google/uuid v1.6.0` added to generated project's `go.mod`
+
+#### CLI
+- `jua generate notification <Name>` — scaffold a typed notification template + HTML email file
+- `--type` flag: `transactional` | `operational` | `marketing` | `security` (default: `operational`)
+- `--channels` flag: comma-separated list `sms,email,push,whatsapp,inapp` (default: `sms,email,push,inapp`)
+
+#### Integrations (Phase 13 wiring)
+- Billing: `events.Publish(SubscriptionActivated/Cancelled)` on plan changes
+- Auth (phone): `events.Publish(UserLoggedIn)` on successful OTP verification
+- Webhooks: `events.PublishCustom()` in dispatcher after processing incoming webhook
+- USSD engine: `events.Publish(USSDSessionCompleted)` when session ends
+
+#### Documentation
+- `docs/realtime/` — overview, SSE, WebSocket, frontend SDK guides
+- `docs/notifications/` — overview, templates, preferences, channels guides
+
 ## [0.2.0] - 2026-04-01
 
 ### Added
