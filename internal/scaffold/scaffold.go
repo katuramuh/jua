@@ -78,7 +78,7 @@ func (o *Options) Normalize() {
 }
 
 // ValidStyles lists all supported admin panel style variants.
-var ValidStyles = []string{"default", "modern", "minimal", "glass"}
+var ValidStyles = []string{"default", "modern", "minimal", "glass", "centered"}
 
 // ValidateStyle checks that the Style field is a supported value.
 // If empty, it defaults to "default".
@@ -713,6 +713,10 @@ func createDirectories(root string, opts Options) error {
 		} else {
 			dirs = append(dirs,
 				filepath.Join(root, "apps", "web", "app"),
+				filepath.Join(root, "apps", "web", "app", "(auth)", "login"),
+				filepath.Join(root, "apps", "web", "app", "(auth)", "register"),
+				filepath.Join(root, "apps", "web", "app", "(auth)", "forgot-password"),
+				filepath.Join(root, "apps", "web", "app", "(auth)", "callback"),
 				filepath.Join(root, "apps", "web", "lib"),
 				filepath.Join(root, "apps", "web", "__tests__"),
 			)

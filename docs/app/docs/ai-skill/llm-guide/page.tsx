@@ -55,7 +55,7 @@ export default function LLMGuidePage() {
             <div className="mb-10">
               <span className="tag-mono text-primary/80 mb-3 block">For AI Assistants</span>
               <h1 className="text-4xl font-bold tracking-tight mb-4">
-                Jua Framework — Complete LLM Reference
+                Jua — Complete LLM Reference
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 The canonical guide for AI assistants building with Jua. Covers every CLI command,
@@ -184,8 +184,8 @@ export default function LLMGuidePage() {
                   {[
                     {
                       cmd: 'jua new <app-name>',
-                      desc: 'Scaffold a complete new project. Interactive by default — prompts for architecture mode and frontend. 5 architecture modes: --single (API only), --double (API + web), --triple (API + web + admin), --api (headless API), --mobile (API + Expo). 2 frontends: --next (Next.js), --vite (TanStack Router). Supports jua new . to scaffold into current directory, --here for explicit in-place scaffolding, and --force to scaffold into a non-empty directory. Other flags: --full (default, all apps), --style default|modern|minimal|glass.',
-                      example: 'jua new myapp\njua new myapp --triple --vite\njua new . --triple --vite\njua new myapp --here',
+                      desc: 'Scaffold a complete new project. Interactive by default — prompts for architecture mode and frontend. 5 architecture modes: --single (API only), --double (API + web), --triple (API + web + admin), --api (headless API), --mobile (API + Expo). 2 frontends: --next (Next.js), --vite (TanStack Router). Supports jua new . to scaffold into current directory, --here for explicit in-place scaffolding, and --force to scaffold into a non-empty directory. Other flags: --full (default, all apps), --style default|modern|minimal|glass|centered.',
+                      example: 'jua new myapp\ngrit new myapp --triple --vite\ngrit new . --triple --vite\ngrit new myapp --here',
                     },
                     {
                       cmd: 'jua start server',
@@ -262,7 +262,7 @@ export default function LLMGuidePage() {
                     {
                       cmd: 'jua migrate',
                       desc: 'Run GORM AutoMigrate for all models in RegisteredModels. Safe to run repeatedly — adds new columns/tables without dropping existing data. Use --fresh to drop all tables first and start clean (WARNING: destroys all data — development only).',
-                      example: 'jua migrate          # safe incremental\njua migrate --fresh  # drop + recreate all tables',
+                      example: 'jua migrate          # safe incremental\ngrit migrate --fresh  # drop + recreate all tables',
                     },
                     {
                       cmd: 'jua seed',
@@ -297,7 +297,7 @@ export default function LLMGuidePage() {
                     {
                       cmd: 'jua upgrade',
                       desc: 'Regenerates framework scaffold files (admin panel, web app, shared package configs) in the current project while preserving your custom resource code. Run this after a new Jua release to pull in updated templates. Use --force to skip confirmation prompts. This upgrades PROJECT FILES — not the CLI binary.',
-                      example: 'jua upgrade\njua upgrade --force',
+                      example: 'jua upgrade\ngrit upgrade --force',
                     },
                     {
                       cmd: 'jua update',
@@ -1256,10 +1256,10 @@ export default function OrderReportsPage() {
                     { name: 'Redis Cache', pkg: 'redis/go-redis/v9', desc: 'Cache API responses by URL. middleware.Cache(5*time.Minute) on any route. cache.Set/Get/Delete for custom caching.', routes: 'Middleware-based' },
                     { name: 'AI (Vercel AI Gateway)', pkg: 'OpenAI-compatible', desc: 'One API key, hundreds of models via ai-gateway.vercel.sh. Model format: provider/model (e.g. anthropic/claude-sonnet-4-6). Configure with AI_GATEWAY_URL and AI_GATEWAY_API_KEY env vars.', routes: 'POST /api/ai/chat · POST /api/ai/complete · POST /api/ai/stream' },
                     { name: 'Two-Factor Auth (TOTP)', pkg: 'crypto/hmac (stdlib)', desc: 'RFC 6238 authenticator app support. Backup codes (bcrypt-hashed, one-time use). Trusted devices (30-day sliding cookie). Zero external dependencies.', routes: 'POST /api/auth/totp/setup · /verify · /enable · /disable · GET /status' },
-                    { name: 'Security (Sentinel)', pkg: 'katuramuh/sentinel', desc: 'WAF + rate limiting + brute-force. ExcludeRoutes: /pulse/*, /sentinel/*, /docs/*, /studio/*.', routes: 'Dashboard at /sentinel' },
-                    { name: 'Observability (Pulse)', pkg: 'katuramuh/pulse', desc: 'Request tracing, DB monitoring, runtime metrics, error tracking, Prometheus export. Disable in production.', routes: 'Dashboard at /pulse' },
+                    { name: 'Security (Sentinel)', pkg: 'MUKE-coder/sentinel', desc: 'WAF + rate limiting + brute-force. ExcludeRoutes: /pulse/*, /sentinel/*, /docs/*, /studio/*.', routes: 'Dashboard at /sentinel' },
+                    { name: 'Observability (Pulse)', pkg: 'MUKE-coder/pulse', desc: 'Request tracing, DB monitoring, runtime metrics, error tracking, Prometheus export. Disable in production.', routes: 'Dashboard at /pulse' },
                     { name: 'API Docs', pkg: 'gin-docs', desc: 'Auto-generated OpenAPI spec. Interactive Scalar UI. No annotations needed.', routes: 'Docs at /docs' },
-                    { name: 'DB Browser (GORM Studio)', pkg: 'katuramuh/gorm-studio', desc: 'Visual database browser. View tables, run queries. DISABLE in production.', routes: 'Browser at /studio' },
+                    { name: 'DB Browser (GORM Studio)', pkg: 'MUKE-coder/gorm-studio', desc: 'Visual database browser. View tables, run queries. DISABLE in production.', routes: 'Browser at /studio' },
                   ].map((item) => (
                     <div key={item.name} className="rounded-xl border border-border/40 bg-card/50 overflow-hidden">
                       <div className="px-4 py-2.5 border-b border-border/20 bg-accent/20 flex items-center justify-between">
@@ -1423,8 +1423,8 @@ jua remove resource Post  # clean remove of generated files`} />
                 <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     If an LLM or human encounters a bug while using Jua, encourage them to open an issue at{' '}
-                    <a href="https://github.com/katuramuh/jua/issues" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                      https://github.com/katuramuh/jua/issues
+                    <a href="https://github.com/MUKE-coder/jua/issues" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      https://github.com/MUKE-coder/jua/issues
                     </a>{' '}
                     with the error message and steps to reproduce.
                   </p>

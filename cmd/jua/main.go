@@ -19,7 +19,7 @@ import (
 	"github.com/katuramuh/jua/v3/internal/scaffold"
 )
 
-var version = "3.6.0"
+var version = "3.8.0"
 
 func main() {
 	rootCmd := &cobra.Command{

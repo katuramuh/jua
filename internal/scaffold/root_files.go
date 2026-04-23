@@ -8,20 +8,25 @@ import (
 func writeRootFiles(root string, opts Options) error {
 	files := map[string]string{
 		filepath.Join(root, ".env"):               envFile(opts),
-		filepath.Join(root, ".env.example"):       envExampleFile(opts),
-		filepath.Join(root, ".env.cloud.example"): envCloudExampleFile(opts),
+		filepath.Join(root, ".env.example"):       envFile(opts), // Same as .env — serves as documentation for other devs
 		filepath.Join(root, ".gitignore"):         rootGitignore(),
 		filepath.Join(root, "README.md"):          readmeFile(opts),
-		filepath.Join(root, "jua.json"):          juaJSON(opts),
+		filepath.Join(root, "jua.json"):            gritJSON(opts),
 		filepath.Join(root, ".claude", "skills", "jua", "SKILL.md"):      juaSkillFile(opts),
 		filepath.Join(root, ".claude", "skills", "jua", "reference.md"):  juaSkillReference(opts),
+	}
+
+	// Prettier config (all architectures with frontend)
+	if opts.Architecture != ArchAPI {
+		files[filepath.Join(root, ".prettierrc")] = prettierConfig()
+		files[filepath.Join(root, ".prettierignore")] = prettierIgnore()
 	}
 
 	if opts.ShouldUseTurborepo() {
 		files[filepath.Join(root, "pnpm-workspace.yaml")] = pnpmWorkspace()
 		files[filepath.Join(root, "turbo.json")] = turboJSON()
 		files[filepath.Join(root, "package.json")] = rootPackageJSON(opts)
-		files[filepath.Join(root, "jua.config.ts")] = juaConfig(opts)
+		files[filepath.Join(root, "jua.config.ts")] = gritConfig(opts)
 		files[filepath.Join(root, "postcss.config.mjs")] = rootPostCSSConfig()
 	}
 
@@ -44,7 +49,7 @@ APP_PORT=8080
 APP_URL=http://localhost:8080
 
 # Database
-DATABASE_URL=postgres://jua:jua@localhost:5432/%s?sslmode=disable
+DATABASE_URL=postgres://grit:grit@localhost:5432/%s?sslmode=disable
 
 # JWT
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
@@ -62,7 +67,7 @@ OAUTH_FRONTEND_URL=http://localhost:3001
 REDIS_URL=redis://localhost:6379
 
 # Docker Compose — Production (used by docker-compose.prod.yml)
-POSTGRES_USER=jua
+POSTGRES_USER=grit
 POSTGRES_PASSWORD=change-me-in-production
 POSTGRES_DB=%s
 API_URL=http://localhost:8080
@@ -133,7 +138,7 @@ APP_PORT=8080               # API server port
 APP_URL=http://localhost:8080
 
 # Database — PostgreSQL connection
-DATABASE_URL=postgres://jua:jua@localhost:5432/myapp?sslmode=disable
+DATABASE_URL=postgres://grit:grit@localhost:5432/myapp?sslmode=disable
 
 # JWT — Authentication tokens
 JWT_SECRET=change-me-in-production   # MUST change in production
@@ -153,7 +158,7 @@ OAUTH_FRONTEND_URL=http://localhost:3001  # Where to redirect after OAuth
 REDIS_URL=redis://localhost:6379
 
 # Docker Compose — Production overrides (used by docker-compose.prod.yml)
-POSTGRES_USER=jua                   # Postgres user (shared with DATABASE_URL)
+POSTGRES_USER=grit                   # Postgres user (shared with DATABASE_URL)
 POSTGRES_PASSWORD=change-me          # MUST change for production
 POSTGRES_DB=myapp                    # Database name
 API_URL=https://api.example.com      # Public API URL (baked into Next.js at build time)
@@ -321,6 +326,7 @@ tmp/
 *.dylib
 *.test
 *.out
+migrate.exe
 
 # Environment
 .env
@@ -346,10 +352,49 @@ minio-data/
 # Turborepo
 .turbo/
 
+# Sentinel (WAF database)
+sentinel.db
+sentinel.db-shm
+sentinel.db-wal
+
+# Testing
+e2e/test-results/
+e2e/playwright-report/
+coverage/
+
 # Debug
 *.log
 npm-debug.log*
 pnpm-debug.log*
+`
+}
+
+func prettierConfig() string {
+	return `{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "plugins": ["prettier-plugin-tailwindcss"]
+}
+`
+}
+
+func prettierIgnore() string {
+	return `node_modules/
+.next/
+dist/
+build/
+out/
+coverage/
+.turbo/
+pnpm-lock.yaml
+*.min.js
+*.min.css
 `
 }
 
@@ -440,7 +485,7 @@ func rootPackageJSON(opts Options) string {
 `, opts.ProjectName, scripts)
 }
 
-func juaConfig(opts Options) string {
+func gritConfig(opts Options) string {
 	style := opts.Style
 	if style == "" {
 		style = "default"
@@ -578,11 +623,11 @@ No Docker needed — just your API keys and `+"``"+`go run`+"``"+`.
 
 ---
 
-*Built with Jua v0.13.0*
+*Built with Grit v0.13.0*
 `, opts.ProjectName, opts.ProjectName)
 }
 
-func juaJSON(opts Options) string {
+func gritJSON(opts Options) string {
 	return fmt.Sprintf(`{
   "architecture": "%s",
   "frontend": "%s",

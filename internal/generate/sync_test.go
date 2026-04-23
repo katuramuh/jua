@@ -213,7 +213,7 @@ func TestParseGoStructs(t *testing.T) {
 import "time"
 
 type Product struct {
-	ID        uint      ` + "`" + `gorm:"primarykey" json:"id"` + "`" + `
+	ID        string    ` + "`" + `gorm:"primarykey;size:36" json:"id"` + "`" + `
 	Name      string    ` + "`" + `gorm:"size:255" json:"name"` + "`" + `
 	Price     float64   ` + "`" + `json:"price"` + "`" + `
 	Active    bool      ` + "`" + `json:"active"` + "`" + `
@@ -287,7 +287,7 @@ type Bar struct {
 	})
 
 	t.Run("file not found returns error", func(t *testing.T) {
-		_, err := parseGoStructs("/tmp/does-not-exist-jua-parse.go")
+		_, err := parseGoStructs("/tmp/does-not-exist-grit-parse.go")
 		if err == nil {
 			t.Error("expected error for missing file, got nil")
 		}

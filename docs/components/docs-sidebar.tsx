@@ -74,6 +74,11 @@ const navItems: NavItem[] = [
     items: [
       { title: 'Architecture Overview', href: '/docs/concepts/architecture' },
       { title: 'Architecture Modes', href: '/docs/concepts/architecture-modes' },
+      { title: 'Triple (Web+Admin+API)', href: '/docs/concepts/architecture-modes/triple' },
+      { title: 'Double (Web+API)', href: '/docs/concepts/architecture-modes/double' },
+      { title: 'Single (One Binary)', href: '/docs/concepts/architecture-modes/single' },
+      { title: 'API Only', href: '/docs/concepts/architecture-modes/api-only' },
+      { title: 'Mobile (API+Expo)', href: '/docs/concepts/architecture-modes/mobile' },
       { title: 'CLI Commands', href: '/docs/concepts/cli' },
       { title: 'New CLI Commands', href: '/docs/concepts/cli-commands' },
       { title: 'Code Generation', href: '/docs/concepts/code-generation' },
@@ -376,7 +381,7 @@ export function MobileNav() {
             {[
               { label: 'Docs', href: '/docs' },
               { label: 'Showcase', href: '/showcase' },
-              { label: 'JuaCMS', href: 'https://juaframework.dev' },
+              { label: 'JuaCMS', href: 'https://gritcms.com' },
               { label: 'Hire Us', href: '/hire' },
             ].map((item) => (
               <Link

@@ -64,7 +64,7 @@ export default function DocsIntroductionPage() {
               <div className="aspect-video">
                 <iframe
                   src="https://www.youtube.com/embed/F-6ZEJLy8Yc"
-                  title="What is Jua Framework?"
+                  title="What is Jua?"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                   className="w-full h-full"
@@ -588,6 +588,11 @@ export default function DocsIntroductionPage() {
                 <Link href="/docs/getting-started/philosophy">
                   Read the Philosophy
                 </Link>
+              </Button>
+              <Button variant="outline" asChild className="border-border/60 bg-transparent hover:bg-accent/50">
+                <a href="https://github.com/MUKE-coder/jua/tree/main/examples" target="_blank" rel="noreferrer">
+                  Browse Examples
+                </a>
               </Button>
             </div>
           </div>

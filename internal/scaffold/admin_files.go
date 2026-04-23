@@ -14,6 +14,8 @@ func adminLoginPageForStyle(style string) string {
 		return minimalLoginPage()
 	case "glass":
 		return glassLoginPage()
+	case "centered":
+		return centeredLoginPage()
 	default:
 		return adminLoginPage()
 	}
@@ -28,6 +30,8 @@ func adminSignUpPageForStyle(style string) string {
 		return minimalSignUpPage()
 	case "glass":
 		return glassSignUpPage()
+	case "centered":
+		return centeredSignUpPage()
 	default:
 		return adminSignUpPage()
 	}
@@ -42,6 +46,8 @@ func adminForgotPasswordPageForStyle(style string) string {
 		return minimalForgotPasswordPage()
 	case "glass":
 		return glassForgotPasswordPage()
+	case "centered":
+		return centeredForgotPasswordPage()
 	default:
 		return adminForgotPasswordPage()
 	}
@@ -56,6 +62,9 @@ func adminDashboardPageForStyle(style string) string {
 		return minimalDashboardPage()
 	case "glass":
 		return glassDashboardPage()
+	case "centered":
+		// Centered style uses the default dashboard (only auth pages differ)
+		return adminDashboardPage()
 	default:
 		return adminDashboardPage()
 	}
@@ -208,6 +217,7 @@ func writeAdminFiles(root string, opts Options) error {
 		filepath.Join(adminRoot, "components", "layout", "admin-layout.tsx"): adminLayoutComponent(),
 		filepath.Join(adminRoot, "components", "layout", "sidebar.tsx"):      adminSidebar(),
 		filepath.Join(adminRoot, "components", "layout", "navbar.tsx"):       adminNavbar(),
+		filepath.Join(adminRoot, "components", "layout", "page-header.tsx"):  adminPageHeader(),
 
 		// Table components
 		filepath.Join(adminRoot, "components", "tables", "data-table.tsx"):       adminDataTable(),
@@ -302,10 +312,11 @@ func adminPackageJSON(opts Options) string {
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3001",
+    "dev": "rm -rf .next && next dev --port 3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "format": "prettier --write .",
     "analyze": "ANALYZE=true next build",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -347,6 +358,8 @@ func adminPackageJSON(opts Options) string {
     "autoprefixer": "^10.4.0",
     "jsdom": "^25.0.0",
     "postcss": "^8.4.0",
+    "prettier": "^3.3.0",
+    "prettier-plugin-tailwindcss": "^0.6.0",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.3.0",
     "vitest": "^2.0.0"
@@ -542,7 +555,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "%s Admin",
-  description: "Admin panel — Built with Jua",
+  description: "Admin panel — Built with Grit",
 };
 
 export default function RootLayout({
@@ -959,17 +972,17 @@ export default function LoginPage() {
             Manage everything<br />in one place.
           </h1>
           <p className="text-text-secondary text-lg max-w-md">
-            The admin dashboard for your Jua application. Monitor, manage, and control your entire platform.
+            The admin dashboard for your Grit application. Monitor, manage, and control your entire platform.
           </p>
         </div>
-        <p className="text-text-muted text-sm">Built with Jua — Go + React framework</p>
+        <p className="text-text-muted text-sm">Built with Grit — Go + React framework</p>
       </div>
 
       {/* Right panel — form */}
       <div className="flex flex-1 items-center justify-center px-6 py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="lg:hidden text-center mb-8">
-            <span className="text-2xl font-bold text-accent">Jua</span>
+            <span className="text-2xl font-bold text-accent">Grit</span>
             <span className="ml-2 rounded-md bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
               Admin
             </span>
@@ -1110,14 +1123,14 @@ export default function SignUpPage() {
             Create your account and start managing your application in minutes.
           </p>
         </div>
-        <p className="text-text-muted text-sm">Built with Jua — Go + React framework</p>
+        <p className="text-text-muted text-sm">Built with Grit — Go + React framework</p>
       </div>
 
       {/* Right panel — form */}
       <div className="flex flex-1 items-center justify-center px-6 py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="lg:hidden text-center mb-8">
-            <span className="text-2xl font-bold text-accent">Jua</span>
+            <span className="text-2xl font-bold text-accent">Grit</span>
             <span className="ml-2 rounded-md bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
               Admin
             </span>
@@ -1301,14 +1314,14 @@ export default function ForgotPasswordPage() {
             Enter your email and we&apos;ll send you a link to get back into your account.
           </p>
         </div>
-        <p className="text-text-muted text-sm">Built with Jua — Go + React framework</p>
+        <p className="text-text-muted text-sm">Built with Grit — Go + React framework</p>
       </div>
 
       {/* Right panel — form */}
       <div className="flex flex-1 items-center justify-center px-6 py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="lg:hidden text-center mb-8">
-            <span className="text-2xl font-bold text-accent">Jua</span>
+            <span className="text-2xl font-bold text-accent">Grit</span>
           </div>
 
           <div>

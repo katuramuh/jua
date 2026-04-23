@@ -30,7 +30,7 @@ export function SiteHeader() {
               Jua
             </span>
             <span className="hidden sm:inline-flex items-center rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-mono font-medium text-primary/80">
-              v3.6.0
+              v3.8.0
             </span>
           </Link>
         </div>
@@ -70,14 +70,14 @@ export function SiteHeader() {
           )}
 
           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent/50" asChild>
-            <Link href="https://github.com/katuramuh/jua" target="_blank" rel="noreferrer">
+            <Link href="https://github.com/MUKE-coder/jua" target="_blank" rel="noreferrer">
               <Github className="h-4 w-4" />
               <span className="sr-only">GitHub</span>
             </Link>
           </Button>
 
           <Button variant="ghost" size="icon" className="hidden sm:inline-flex h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent/50" asChild>
-            <Link href="https://www.youtube.com/@JuaFramework" target="_blank" rel="noreferrer">
+            <Link href="https://www.youtube.com/@Jua" target="_blank" rel="noreferrer">
               <Youtube className="h-4 w-4" />
               <span className="sr-only">YouTube</span>
             </Link>

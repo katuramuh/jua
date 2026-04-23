@@ -68,7 +68,7 @@ func docsPackageJSON(opts Options) string {
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3002",
+    "dev": "rm -rf .next && next dev --port 3002",
     "build": "next build",
     "start": "next start --port 3002"
   },
@@ -223,7 +223,7 @@ export const metadata: Metadata = {
     template: "%%s | %s Docs",
     default: "%s Documentation",
   },
-  description: "Documentation for %s — Go + React. Built with Jua.",
+  description: "Documentation for %s — Go + React. Built with Grit.",
 };
 
 export default function RootLayout({
@@ -260,7 +260,7 @@ export default function HomePage() {
           Documentation
         </h1>
         <p className="text-lg text-fd-muted-foreground mb-8">
-          Everything you need to build with Jua — the full-stack Go + React framework.
+          Everything you need to build with Grit — the full-stack Go + React framework.
         </p>
         <Link
           href="/docs"
@@ -287,7 +287,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       nav={{
         title: (
           <span className="flex items-center gap-2 font-bold">
-            Jua Docs
+            Grit Docs
             <span className="rounded-md bg-fd-primary/10 px-1.5 py-0.5 text-xs font-medium text-fd-primary">
               v0.13.0
             </span>
@@ -358,22 +358,22 @@ title: Introduction
 description: Welcome to the %s documentation. Learn how to build full-stack applications with Go and React.
 ---
 
-## What is Jua?
+## What is Grit?
 
-Jua is a full-stack meta-framework that fuses **Go** (Gin + GORM) with **Next.js** (React + TypeScript) in a monorepo. One command to scaffold a complete project with authentication, admin panel, database browser, and Docker setup.
+Grit is a full-stack meta-framework that fuses **Go** (Gin + GORM) with **Next.js** (React + TypeScript) in a monorepo. One command to scaffold a complete project with authentication, admin panel, database browser, and Docker setup.
 
 ## Features
 
 - **JWT Authentication** — Register, login, refresh tokens, role-based access
 - **Admin Panel** — Full auth (login, sign-up, forgot-password), resource CRUD with DataTable, FormBuilder, ViewModal, toast notifications
-- **Code Generator** — `+"`jua generate resource`"+` creates Go model, handler, service, Zod schemas, TypeScript types, React hooks, and admin page
+- **Code Generator** — `+"`grit generate resource`"+` creates Go model, handler, service, Zod schemas, TypeScript types, React hooks, and admin page
 - **Landing Page** — SaaS marketing page with Framer Motion animations
 - **GORM Studio** — Visual database browser at `+"`/studio`"+`
 - **Batteries Included** — Redis cache, S3 storage, email (Resend), background jobs (asynq), cron scheduler, AI integration (Claude + OpenAI)
 - **Shared Types** — Zod schemas + TypeScript types shared between apps
 - **Docker Ready** — Dev and production Docker Compose setups
-- **Upgrade Command** — `+"`jua upgrade`"+` updates existing projects to the latest scaffold templates
-- **Self-Update** — `+"`jua update`"+` updates the CLI itself to the latest release
+- **Upgrade Command** — `+"`grit upgrade`"+` updates existing projects to the latest scaffold templates
+- **Self-Update** — `+"`grit update`"+` updates the CLI itself to the latest release
 
 ## Tech Stack
 
@@ -393,7 +393,7 @@ Jua is a full-stack meta-framework that fuses **Go** (Gin + GORM) with **Next.js
 
 ## Next Steps
 
-- [Getting Started](/docs/getting-started) — Install Jua and create your first project
+- [Getting Started](/docs/getting-started) — Install Grit and create your first project
 - [CLI Commands](/docs/cli/commands) — All available CLI commands
 - [Admin Panel](/docs/admin/overview) — Dashboard, auth, and resource management
 - [Authentication](/docs/api/authentication) — How the JWT auth system works
@@ -404,14 +404,14 @@ Jua is a full-stack meta-framework that fuses **Go** (Gin + GORM) with **Next.js
 func docsContentGettingStarted(opts Options) string {
 	return fmt.Sprintf(`---
 title: Getting Started
-description: Install Jua and create your first full-stack project in minutes.
+description: Install Grit and create your first full-stack project in minutes.
 ---
 
 **Current version: v0.13.0**
 
 ## Installation
 
-Install the Jua CLI globally:
+Install the Grit CLI globally:
 
 `+"```bash"+`
 go install github.com/katuramuh/jua/v3/cmd/jua@latest
@@ -427,7 +427,7 @@ jua version
 ## Quick Start
 
 `+"```bash"+`
-jua new %s            # Scaffold a new project
+grit new %s            # Scaffold a new project
 cd %s
 docker compose up -d   # Start PostgreSQL, Redis, MinIO, Mailhog
 pnpm install           # Install frontend dependencies
@@ -437,7 +437,7 @@ pnpm dev               # Start all services
 ## Create a New Project
 
 `+"```bash"+`
-jua new %s
+grit new %s
 `+"```"+`
 
 This creates a full monorepo with:
@@ -493,11 +493,11 @@ pnpm dev
 ## CLI Flags
 
 `+"```bash"+`
-jua new myapp            # Full monorepo (api + web + admin + shared)
-jua new myapp --api      # Go API only
-jua new myapp --expo     # Full monorepo + Expo mobile app
-jua new myapp --mobile   # API + Expo mobile app only
-jua new myapp --full     # Everything + documentation site
+grit new myapp            # Full monorepo (api + web + admin + shared)
+grit new myapp --api      # Go API only
+grit new myapp --expo     # Full monorepo + Expo mobile app
+grit new myapp --mobile   # API + Expo mobile app only
+grit new myapp --full     # Everything + documentation site
 `+"```"+`
 
 ## Generate a Resource
@@ -505,7 +505,7 @@ jua new myapp --full     # Everything + documentation site
 Once your project is set up, generate full-stack CRUD resources:
 
 `+"```bash"+`
-jua generate resource Post --fields "title:string,content:text,published:bool"
+grit generate resource Post --fields "title:string,content:text,published:bool"
 `+"```"+`
 
 This creates: Go model, handler, service, Zod schemas, TypeScript types, React Query hooks, and an admin resource page — all wired up automatically.
@@ -520,7 +520,7 @@ go install github.com/katuramuh/jua/v3/cmd/jua@latest
 
 # Then upgrade your project
 cd %s
-jua upgrade
+grit upgrade
 `+"```"+`
 
 This regenerates admin components, web landing page, Docker configs, and documentation while preserving your resource definitions, API code, and environment variables.
@@ -528,10 +528,10 @@ This regenerates admin components, web landing page, Docker configs, and documen
 Use `+"`--force`"+` to overwrite all files without prompting:
 
 `+"```bash"+`
-jua upgrade --force
+grit upgrade --force
 `+"```"+`
 
-After upgrading, run `+"`jua sync`"+` to regenerate TypeScript types from your Go models.
+After upgrading, run `+"`grit sync`"+` to regenerate TypeScript types from your Go models.
 
 ## No Docker?
 
@@ -553,7 +553,7 @@ description: JWT-based authentication with access and refresh tokens.
 
 ## Overview
 
-Jua uses **JWT (JSON Web Tokens)** for authentication with a dual-token system:
+Grit uses **JWT (JSON Web Tokens)** for authentication with a dual-token system:
 
 - **Access Token** — Short-lived (15 minutes), sent with every request
 - **Refresh Token** — Long-lived (7 days), used to obtain new access tokens
@@ -700,15 +700,15 @@ func docsContentBatteriesMeta() string {
 func docsContentCLI() string {
 	return `---
 title: CLI Commands
-description: Complete reference for all Jua CLI commands.
+description: Complete reference for all Grit CLI commands.
 ---
 
-## jua new
+## grit new
 
-Scaffold a new Jua project.
+Scaffold a new Grit project.
 
 ` + "```bash" + `
-jua new <project-name> [flags]
+grit new <project-name> [flags]
 ` + "```" + `
 
 **Flags:**
@@ -723,20 +723,20 @@ jua new <project-name> [flags]
 **Examples:**
 
 ` + "```bash" + `
-jua new my-saas              # Full monorepo
-jua new my-saas --api        # Backend only
-jua new my-saas --full       # With docs site
+grit new my-saas              # Full monorepo
+grit new my-saas --api        # Backend only
+grit new my-saas --full       # With docs site
 ` + "```" + `
 
-## jua generate resource
+## grit generate resource
 
 Generate a full-stack CRUD resource with a single command.
 
 ` + "```bash" + `
-jua generate resource <Name> [flags]
+grit generate resource <Name> [flags]
 ` + "```" + `
 
-**Aliases:** jua g resource
+**Aliases:** grit g resource
 
 **Flags:**
 
@@ -777,7 +777,7 @@ jua generate resource <Name> [flags]
 Append modifiers after the type with a colon:
 
 ` + "```bash" + `
-jua g resource Post --fields "title:string:required,slug:string:unique,views:int:default=0"
+grit g resource Post --fields "title:string:required,slug:string:unique,views:int:default=0"
 ` + "```" + `
 
 | Modifier | Description |
@@ -787,22 +787,22 @@ jua g resource Post --fields "title:string:required,slug:string:unique,views:int
 | optional | Nullable field |
 | default=X | Default value |
 
-## jua sync
+## grit sync
 
 Sync Go model types to TypeScript types and Zod schemas.
 
 ` + "```bash" + `
-jua sync
+grit sync
 ` + "```" + `
 
 Parses all Go model files in apps/api/internal/models/ and regenerates the corresponding TypeScript types and Zod schemas in packages/shared/.
 
-## jua upgrade
+## grit upgrade
 
-Upgrade an existing Jua project to the latest scaffold templates.
+Upgrade an existing Grit project to the latest scaffold templates.
 
 ` + "```bash" + `
-jua upgrade [flags]
+grit upgrade [flags]
 ` + "```" + `
 
 **Flags:**
@@ -826,14 +826,14 @@ jua upgrade [flags]
 - Environment variables (.env)
 - Custom code you've written
 
-Run jua sync after upgrading to regenerate TypeScript types.
+Run grit sync after upgrading to regenerate TypeScript types.
 
-## jua migrate
+## grit migrate
 
 Run database migrations using GORM AutoMigrate.
 
 ` + "```bash" + `
-jua migrate [flags]
+grit migrate [flags]
 ` + "```" + `
 
 **Flags:**
@@ -845,18 +845,18 @@ jua migrate [flags]
 **Examples:**
 
 ` + "```bash" + `
-jua migrate            # Run migrations
-jua migrate --fresh    # Drop all tables and re-migrate
+grit migrate            # Run migrations
+grit migrate --fresh    # Drop all tables and re-migrate
 ` + "```" + `
 
 The migrate command connects to the database (using DATABASE_URL from .env) and runs GORM AutoMigrate for all registered models. Use --fresh to drop all tables first — useful for resetting during development.
 
-## jua seed
+## grit seed
 
 Populate the database with initial data.
 
 ` + "```bash" + `
-jua seed
+grit seed
 ` + "```" + `
 
 Seeds the database with:
@@ -866,21 +866,21 @@ Seeds the database with:
 
 The seeder is idempotent — it skips records that already exist. Add your own seeders in apps/api/internal/database/seed.go.
 
-## jua update
+## grit update
 
-Update the Jua CLI itself to the latest version. This removes the current binary and installs the newest release from GitHub.
+Update the Grit CLI itself to the latest version. This removes the current binary and installs the newest release from GitHub.
 
 ` + "```bash" + `
-jua update
+grit update
 ` + "```" + `
 
 This runs ` + "`go install github.com/katuramuh/jua/v3/cmd/jua@latest`" + ` under the hood, replacing the old binary with the latest version. Run ` + "`jua version`" + ` afterwards to verify.
 
-> **Note:** ` + "`jua update`" + ` updates the **CLI tool**. To update your **project's scaffold files**, use ` + "`jua upgrade`" + ` instead.
+> **Note:** ` + "`grit update`" + ` updates the **CLI tool**. To update your **project's scaffold files**, use ` + "`grit upgrade`" + ` instead.
 
 ## jua version
 
-Print the installed Jua CLI version.
+Print the installed Grit CLI version.
 
 ` + "```bash" + `
 jua version
@@ -896,7 +896,7 @@ description: Database migrations with GORM AutoMigrate and seeding with initial 
 
 ## Overview
 
-Jua uses **GORM AutoMigrate** for database schema management. Migrations run automatically on API startup and can also be triggered manually via the CLI. Seeding populates the database with initial data for development and production.
+Grit uses **GORM AutoMigrate** for database schema management. Migrations run automatically on API startup and can also be triggered manually via the CLI. Seeding populates the database with initial data for development and production.
 
 ## Migrations
 
@@ -911,7 +911,7 @@ func AutoMigrate(db *gorm.DB) error {
     models := []interface{}{
         &User{},
         &Upload{},
-        // jua:models  <-- new models injected here by jua generate
+        // grit:models  <-- new models injected here by grit generate
     }
 
     for _, model := range models {
@@ -930,10 +930,10 @@ Migrations run automatically when the API starts. You can also run them manually
 
 ` + "```bash" + `
 # Run migrations
-jua migrate
+grit migrate
 
 # Drop all tables and re-migrate (development only!)
-jua migrate --fresh
+grit migrate --fresh
 ` + "```" + `
 
 ### Fresh Migrations
@@ -944,17 +944,17 @@ The --fresh flag drops **all tables** in the database and re-creates them from s
 
 ` + "```bash" + `
 # Reset everything and re-seed
-jua migrate --fresh
-jua seed
+grit migrate --fresh
+grit seed
 ` + "```" + `
 
 ### Adding New Models
 
-When you run jua generate resource, it automatically:
+When you run grit generate resource, it automatically:
 
 1. Creates a new Go model file
-2. Injects the model into AutoMigrate via the // jua:models marker
-3. Migrations run on next API startup or jua migrate
+2. Injects the model into AutoMigrate via the // grit:models marker
+3. Migrations run on next API startup or grit migrate
 
 To add a model manually:
 
@@ -971,14 +971,14 @@ type Post struct {
 }
 ` + "```" + `
 
-Then add it to AutoMigrate in models/user.go above the // jua:models marker.
+Then add it to AutoMigrate in models/user.go above the // grit:models marker.
 
 ## Seeding
 
 ### Running Seeders
 
 ` + "```bash" + `
-jua seed
+grit seed
 ` + "```" + `
 
 This creates:
@@ -1003,7 +1003,7 @@ func Seed(db *gorm.DB) error {
     if err := seedDemoUsers(db); err != nil {
         return err
     }
-    // jua:seeders  <-- add your own seeders above this marker
+    // grit:seeders  <-- add your own seeders above this marker
     return nil
 }
 ` + "```" + `
@@ -1045,23 +1045,23 @@ if err := seedCategories(db); err != nil {
 
 ### Idempotent Seeders
 
-Seeders check if records already exist before creating them. This means you can run jua seed multiple times without creating duplicates.
+Seeders check if records already exist before creating them. This means you can run grit seed multiple times without creating duplicates.
 
 ## Common Workflow
 
 ` + "```bash" + `
 # Initial setup
 docker compose up -d          # Start PostgreSQL
-jua migrate                  # Create tables
-jua seed                     # Populate with test data
+grit migrate                  # Create tables
+grit seed                     # Populate with test data
 
 # After adding a new resource
-jua generate resource Post --fields "title:string,content:text"
-jua migrate                  # Apply new table
+grit generate resource Post --fields "title:string,content:text"
+grit migrate                  # Apply new table
 
 # Reset during development
-jua migrate --fresh          # Drop everything
-jua seed                     # Re-populate
+grit migrate --fresh          # Drop everything
+grit seed                     # Re-populate
 ` + "```" + `
 `
 }
@@ -1074,7 +1074,7 @@ description: A complete admin dashboard with authentication, resource management
 
 ## Overview
 
-The Jua admin panel is a full-featured Next.js application at apps/admin/. It includes authentication, a dashboard, resource CRUD management, and system administration pages.
+The Grit admin panel is a full-featured Next.js application at apps/admin/. It includes authentication, a dashboard, resource CRUD management, and system administration pages.
 
 ## Architecture
 
@@ -1148,7 +1148,7 @@ Under /system/*, the admin includes:
 func docsContentAdminResources() string {
 	return `---
 title: Resource Management
-description: How resources work in the Jua admin panel — DataTable, FormBuilder, ViewModal, and more.
+description: How resources work in the Grit admin panel — DataTable, FormBuilder, ViewModal, and more.
 ---
 
 ## Overview
@@ -1269,7 +1269,7 @@ Available column formats for the DataTable:
 Use the CLI to generate a complete resource:
 
 ` + "```bash" + `
-jua generate resource Post --fields "title:string,content:text,status:select:draft,published"
+grit generate resource Post --fields "title:string,content:text,status:select:draft,published"
 ` + "```" + `
 
 This creates all Go backend code, shared types, React hooks, resource definition, and admin page — fully wired up and ready to use.
@@ -1284,7 +1284,7 @@ description: Built-in services for cache, storage, email, background jobs, cron,
 
 ## Overview
 
-Jua comes with "batteries included" — production-ready services that are scaffolded with every project. All services follow a graceful degradation pattern: if the backing service (Redis, MinIO, etc.) is unavailable, the app logs a warning but continues running.
+Grit comes with "batteries included" — production-ready services that are scaffolded with every project. All services follow a graceful degradation pattern: if the backing service (Redis, MinIO, etc.) is unavailable, the app logs a warning but continues running.
 
 ## Redis Cache
 
@@ -1430,14 +1430,14 @@ All backing services are included in docker-compose.yml:
 func docsContentAbout() string {
 	return `---
 title: About the Creator
-description: Meet the developer behind Jua.
+description: Meet the developer behind Grit.
 ---
 
-## Katuramu (JB)
+## Muke Johnbaptist (JB)
 
 **Fullstack Developer | Tech Entrepreneur | Educator**
 
-Jua is created by **Katuramu** (JB), a self-taught tech entrepreneur, educator, and founder based in **Kampala, Uganda**. JB is passionate about building digital solutions and empowering others to succeed in tech.
+Grit is created by **Muke Johnbaptist** (JB), a self-taught tech entrepreneur, educator, and founder based in **Kampala, Uganda**. JB is passionate about building digital solutions and empowering others to succeed in tech.
 
 ## Background
 
@@ -1445,9 +1445,9 @@ JB is entirely self-taught with no formal computer science degree. He transition
 
 ## What He Does
 
-- **Founder & CEO** of [Desishub Technologies](https://katuramuh.com) — a company that develops websites, mobile applications, and AI-powered business solutions across Africa and beyond
+- **Founder & CEO** of [Desishub Technologies](https://desishub.com) — a company that develops websites, mobile applications, and AI-powered business solutions across Africa and beyond
 - **Founder** of Nextjs Academy — an online learning platform with 9+ courses
-- **YouTube Creator** — [Jua Framework](https://youtube.com/@JuaFramework) and [Katuramu](https://youtube.com/@katuramuh) channels
+- **YouTube Creator** — [Jua](https://youtube.com/@JuaFramework) and [JB Web Developer](https://youtube.com/@JBWEBDEVELOPER) channels
 - **Educator** — Trained 100+ students through in-person coding bootcamps
 
 ## Achievements
@@ -1469,14 +1469,14 @@ JB is entirely self-taught with no formal computer science degree. He transition
 ## Connect
 
 - [GitHub](https://github.com/katuramuh) — @katuramuh
-- [YouTube](https://youtube.com/@JuaFramework) — @JuaFramework
+- [YouTube](https://youtube.com/@JuaFramework) — @GritFramework
 - [X (Twitter)](https://x.com/MJohnbaptist) — @MJohnbaptist
-- [LinkedIn](https://linkedin.com/company/jua-framework) — Jua Framework
-- [TikTok](https://tiktok.com/@jbkaturamuh) — @jbkaturamuh
-- [Website](https://juaframework.dev) — juaframework.dev
+- [LinkedIn](https://linkedin.com/company/jua-framework) — Jua
+- [TikTok](https://tiktok.com/@jbdesishub) — @jbdesishub
+- [Website](https://jb.desishub.com) — jb.desishub.com
 
 ---
 
-*Jua is built with the belief that developers deserve better tools — tools that are fast to set up, production-ready, and don't compromise on quality.*
+*Grit is built with the belief that developers deserve better tools — tools that are fast to set up, production-ready, and don't compromise on quality.*
 `
 }
