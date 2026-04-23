@@ -317,7 +317,7 @@ If you are an AI assistant working on this project:
 5. Use React Query for data fetching, Zod for validation
 6. Routes go in `src/routes/`, use `$param` naming for dynamic segments
 7. Use `Route.useParams()` for typed params, `useNavigate()` for navigation
-8. Report bugs at https://github.com/MUKE-coder/jua/issues
+8. Report bugs at https://github.com/katuramuh/jua/issues
 
 ## License
 

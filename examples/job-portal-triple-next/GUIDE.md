@@ -519,4 +519,4 @@ With the core job portal running, consider these enhancements:
 
 ---
 
-Built with [Jua](https://github.com/MUKE-coder/jua).
+Built with [Jua](https://github.com/katuramuh/jua).

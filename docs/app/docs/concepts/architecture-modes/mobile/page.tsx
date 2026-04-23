@@ -649,7 +649,7 @@ docker push myapp-api:latest`} />
                   Expo app with tab navigation, SecureStore auth, shared types, and EAS build config.
                 </p>
                 <a
-                  href="https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-mobile-expo"
+                  href="https://github.com/katuramuh/jua/tree/main/examples/job-portal-mobile-expo"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"

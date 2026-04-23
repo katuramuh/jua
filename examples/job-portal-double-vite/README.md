@@ -263,7 +263,7 @@ If you are an AI assistant working on this project:
 4. Follow the API response format: `{ data, message }` / `{ data, meta }` / `{ error: { code, message } }`
 5. Use React Query for data fetching, Zod for validation
 6. Admin pages go in `src/routes/admin/` with role guards
-7. Report bugs at https://github.com/MUKE-coder/jua/issues
+7. Report bugs at https://github.com/katuramuh/jua/issues
 
 ## License
 

@@ -38,7 +38,7 @@ export default function ArchitectureModesPage() {
                 tagline: 'Go API + embedded React SPA — one binary',
                 color: 'sky',
                 ideal: 'Laravel/Rails developers, solo devs, simple deploys',
-                example: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-single-vite',
+                example: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-single-vite',
                 structure: `my-app/
 ├── cmd/server/main.go   # go:embed frontend/dist/*
 ├── internal/            # Go backend
@@ -58,7 +58,7 @@ export default function ArchitectureModesPage() {
                 tagline: 'Web + API Turborepo monorepo',
                 color: 'violet',
                 ideal: 'MERN stack developers, API + SPA projects',
-                example: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-double-vite',
+                example: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-double-vite',
                 structure: `my-app/
 ├── apps/
 │   ├── api/             # Go backend (Gin + GORM)
@@ -79,7 +79,7 @@ export default function ArchitectureModesPage() {
                 tagline: 'Web + Admin + API Turborepo monorepo',
                 color: 'emerald',
                 ideal: 'Full-stack teams, SaaS products, content platforms',
-                example: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-triple-next',
+                example: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-triple-next',
                 structure: `my-app/
 ├── apps/
 │   ├── api/             # Go backend (Gin + GORM)
@@ -101,7 +101,7 @@ export default function ArchitectureModesPage() {
                 tagline: 'Go API with no frontend',
                 color: 'amber',
                 ideal: 'Microservices, backend teams, mobile-first apps',
-                example: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-api-only',
+                example: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-api-only',
                 structure: `my-app/
 ├── apps/
 │   └── api/             # Go backend (Gin + GORM)
@@ -121,7 +121,7 @@ export default function ArchitectureModesPage() {
                 tagline: 'API + Expo React Native',
                 color: 'rose',
                 ideal: 'Mobile-first products, cross-platform apps',
-                example: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-mobile-expo',
+                example: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-mobile-expo',
                 structure: `my-app/
 ├── apps/
 │   ├── api/             # Go backend
@@ -219,12 +219,12 @@ export default function ArchitectureModesPage() {
             <div className="rounded-lg border border-border/40 bg-accent/20 p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {[
-                  { label: 'Triple + Next.js', href: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-triple-next' },
-                  { label: 'Triple + TanStack', href: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-triple-vite' },
-                  { label: 'Double + TanStack', href: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-double-vite' },
-                  { label: 'Single (one binary)', href: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-single-vite' },
-                  { label: 'API Only', href: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-api-only' },
-                  { label: 'Mobile + Expo', href: 'https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-mobile-expo' },
+                  { label: 'Triple + Next.js', href: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-triple-next' },
+                  { label: 'Triple + TanStack', href: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-triple-vite' },
+                  { label: 'Double + TanStack', href: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-double-vite' },
+                  { label: 'Single (one binary)', href: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-single-vite' },
+                  { label: 'API Only', href: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-api-only' },
+                  { label: 'Mobile + Expo', href: 'https://github.com/katuramuh/jua/tree/main/examples/job-portal-mobile-expo' },
                 ].map((ex) => (
                   <a key={ex.label} href={ex.href} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-md border border-border/30 bg-background/50 px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors">
                     {ex.label}
@@ -233,7 +233,7 @@ export default function ArchitectureModesPage() {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground/60 mt-4">
-                All examples: <a href="https://github.com/MUKE-coder/jua/tree/main/examples" target="_blank" rel="noreferrer" className="text-primary hover:underline">github.com/MUKE-coder/jua/tree/main/examples</a>
+                All examples: <a href="https://github.com/katuramuh/jua/tree/main/examples" target="_blank" rel="noreferrer" className="text-primary hover:underline">github.com/katuramuh/jua/tree/main/examples</a>
               </p>
             </div>
           </div>

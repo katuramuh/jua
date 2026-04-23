@@ -571,7 +571,7 @@ ssh yourserver 'cd /opt/myapp && ./myapp'`} />
                   described above: go:embed, Vite proxy, TanStack Router, and production Dockerfile.
                 </p>
                 <a
-                  href="https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-single-vite"
+                  href="https://github.com/katuramuh/jua/tree/main/examples/job-portal-single-vite"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"

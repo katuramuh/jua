@@ -631,7 +631,7 @@ jua deploy`} />
                   </p>
                 </div>
                 <a
-                  href="https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-triple-next"
+                  href="https://github.com/katuramuh/jua/tree/main/examples/job-portal-triple-next"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors whitespace-nowrap"

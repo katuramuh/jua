@@ -590,7 +590,7 @@ export default function DocsIntroductionPage() {
                 </Link>
               </Button>
               <Button variant="outline" asChild className="border-border/60 bg-transparent hover:bg-accent/50">
-                <a href="https://github.com/MUKE-coder/jua/tree/main/examples" target="_blank" rel="noreferrer">
+                <a href="https://github.com/katuramuh/jua/tree/main/examples" target="_blank" rel="noreferrer">
                   Browse Examples
                 </a>
               </Button>

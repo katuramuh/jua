@@ -502,8 +502,8 @@ turbo dev`} className="mt-4 mb-0 glow-purple-sm" />
             <div className="mb-8 rounded-xl border border-primary/20 bg-primary/5 p-5">
               <p className="text-[15px] text-muted-foreground leading-relaxed">
                 Found a bug or something doesn&apos;t work? Please open an issue at{' '}
-                <a href="https://github.com/MUKE-coder/jua/issues" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  https://github.com/MUKE-coder/jua/issues
+                <a href="https://github.com/katuramuh/jua/issues" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  https://github.com/katuramuh/jua/issues
                 </a>{' '}
                 — your feedback helps us improve Jua for everyone.
               </p>
@@ -515,7 +515,7 @@ turbo dev`} className="mt-4 mb-0 glow-purple-sm" />
               <p className="text-sm text-muted-foreground mb-3">
                 See the same Job Portal app built with every architecture — full source code, setup guide, and deployment config.
               </p>
-              <a href="https://github.com/MUKE-coder/jua/tree/main/examples" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+              <a href="https://github.com/katuramuh/jua/tree/main/examples" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
                 Browse all 6 examples on GitHub &rarr;
               </a>
             </div>

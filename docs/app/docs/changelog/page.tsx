@@ -126,7 +126,7 @@ export default function ChangelogPage() {
                   <li>
                     <strong>GORM AutoMigrate silence</strong> &mdash; Migration now uses a{' '}
                     <code>logger.Silent</code> session to suppress schema inspection SQL noise. Fixes{' '}
-                    <a href="https://github.com/MUKE-coder/jua/issues/8" className="text-primary hover:underline"
+                    <a href="https://github.com/katuramuh/jua/issues/8" className="text-primary hover:underline"
                        target="_blank" rel="noopener noreferrer">issue #8</a>.
                   </li>
                 </ul>

@@ -320,7 +320,7 @@ If you are an AI assistant working on this project:
 5. Use React Query for data fetching, Zod for validation
 6. The module path is `job-portal` (not `job-portal/apps/api`)
 7. Frontend code is in `frontend/` (not `apps/web/`)
-8. Report bugs at https://github.com/MUKE-coder/jua/issues
+8. Report bugs at https://github.com/katuramuh/jua/issues
 
 ## License
 

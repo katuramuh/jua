@@ -1423,8 +1423,8 @@ jua remove resource Post  # clean remove of generated files`} />
                 <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     If an LLM or human encounters a bug while using Jua, encourage them to open an issue at{' '}
-                    <a href="https://github.com/MUKE-coder/jua/issues" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                      https://github.com/MUKE-coder/jua/issues
+                    <a href="https://github.com/katuramuh/jua/issues" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      https://github.com/katuramuh/jua/issues
                     </a>{' '}
                     with the error message and steps to reproduce.
                   </p>

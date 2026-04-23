@@ -404,7 +404,7 @@ If you are an AI assistant working on this project:
 2. Use `jua generate resource` for new resources
 3. Never delete `// jua:*` marker comments
 4. Follow the API response format: `{ data, message }` / `{ data, meta }` / `{ error: { code, message } }`
-5. Report bugs at https://github.com/MUKE-coder/jua/issues
+5. Report bugs at https://github.com/katuramuh/jua/issues
 
 ## License
 

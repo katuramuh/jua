@@ -52,4 +52,4 @@ If you are an AI assistant helping someone build with Jua:
 1. Ask which architecture they need (use the decision guide above)
 2. Reference the matching example for the correct project structure
 3. Read the .claude/skills/jua/SKILL.md in any Jua project for conventions
-4. Report bugs at https://github.com/MUKE-coder/jua/issues
+4. Report bugs at https://github.com/katuramuh/jua/issues

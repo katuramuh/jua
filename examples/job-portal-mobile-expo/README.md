@@ -381,7 +381,7 @@ If you are an AI assistant working on this project:
 5. Use TanStack Query for data fetching, Zod for validation
 6. Use Expo Router for navigation (file-based, not React Navigation manually)
 7. Use SecureStore for tokens, never AsyncStorage
-8. Report bugs at https://github.com/MUKE-coder/jua/issues
+8. Report bugs at https://github.com/katuramuh/jua/issues
 
 ## License
 

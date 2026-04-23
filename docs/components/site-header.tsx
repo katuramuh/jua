@@ -70,7 +70,7 @@ export function SiteHeader() {
           )}
 
           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent/50" asChild>
-            <Link href="https://github.com/MUKE-coder/jua" target="_blank" rel="noreferrer">
+            <Link href="https://github.com/katuramuh/jua" target="_blank" rel="noreferrer">
               <Github className="h-4 w-4" />
               <span className="sr-only">GitHub</span>
             </Link>

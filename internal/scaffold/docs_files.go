@@ -1430,53 +1430,37 @@ All backing services are included in docker-compose.yml:
 func docsContentAbout() string {
 	return `---
 title: About the Creator
-description: Meet the developer behind Grit.
+description: Meet the developer behind Jua.
 ---
 
-## Muke Johnbaptist (JB)
+## katuramuh
 
-**Fullstack Developer | Tech Entrepreneur | Educator**
+**Fullstack Developer | Framework Author**
 
-Grit is created by **Muke Johnbaptist** (JB), a self-taught tech entrepreneur, educator, and founder based in **Kampala, Uganda**. JB is passionate about building digital solutions and empowering others to succeed in tech.
+Jua is created by **katuramuh**, a fullstack developer building tools for Go + React developers — with a focus on Africa-first features, rapid scaffolding, and production-ready defaults.
 
-## Background
+## What He Builds
 
-JB is entirely self-taught with no formal computer science degree. He transitioned from learning to code independently into building a thriving business that serves clients globally. His philosophy: **you don't need a computer science degree to build a successful tech career** — anyone can learn, anyone can build, and anyone can succeed.
-
-## What He Does
-
-- **Founder & CEO** of [Desishub Technologies](https://desishub.com) — a company that develops websites, mobile applications, and AI-powered business solutions across Africa and beyond
-- **Founder** of Nextjs Academy — an online learning platform with 9+ courses
-- **YouTube Creator** — [Jua](https://youtube.com/@JuaFramework) and [JB Web Developer](https://youtube.com/@JBWEBDEVELOPER) channels
-- **Educator** — Trained 100+ students through in-person coding bootcamps
-
-## Achievements
-
-- Generated **$15,000+** in revenue through online courses and digital products
-- Created **9+ online courses** through Nextjs Academy
-- Built multiple **enterprise-level systems** including school management platforms and member management systems
-- Currently maintaining **13 active projects**
+- **Jua Framework** — Go + React meta-framework with CLI scaffolding, code generation, and batteries included
+- **Africa-first integrations** — SMS (AfricasTalking, Relworx), Mobile Money (MTN MoMo, Airtel, Flutterwave), WhatsApp, USSD
+- **Production infrastructure** — one-command deploy, real-time engine, multi-tenancy, background jobs, AI integration
 
 ## Tech Stack
 
 | Layer | Technologies |
 |-------|-------------|
 | Frontend | React, Next.js, TypeScript, Tailwind CSS, shadcn/ui |
-| Backend | Node.js, Hono.js, Go, Express.js, Laravel |
-| Databases | PostgreSQL, MongoDB, Redis |
-| Tools | Docker, Git, Prisma ORM, GORM, Resend, React Query |
+| Backend | Go, Gin, GORM, PostgreSQL, Redis |
+| Tools | Docker, Turborepo, pnpm, Resend, React Query |
 
 ## Connect
 
 - [GitHub](https://github.com/katuramuh) — @katuramuh
-- [YouTube](https://youtube.com/@JuaFramework) — @GritFramework
-- [X (Twitter)](https://x.com/MJohnbaptist) — @MJohnbaptist
-- [LinkedIn](https://linkedin.com/company/jua-framework) — Jua
-- [TikTok](https://tiktok.com/@jbdesishub) — @jbdesishub
-- [Website](https://jb.desishub.com) — jb.desishub.com
+- [YouTube](https://youtube.com/@JuaFramework) — @JuaFramework
+- [LinkedIn](https://linkedin.com/company/jua-framework) — Jua Framework
 
 ---
 
-*Grit is built with the belief that developers deserve better tools — tools that are fast to set up, production-ready, and don't compromise on quality.*
+*Jua is built with the belief that developers deserve better tools — tools that are fast to set up, production-ready, and don't compromise on quality.*
 `
 }

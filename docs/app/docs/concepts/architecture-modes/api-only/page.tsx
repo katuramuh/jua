@@ -524,7 +524,7 @@ volumes:
                   Docker setup, seed data, and API documentation.
                 </p>
                 <a
-                  href="https://github.com/MUKE-coder/jua/tree/main/examples/job-portal-api-only"
+                  href="https://github.com/katuramuh/jua/tree/main/examples/job-portal-api-only"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
