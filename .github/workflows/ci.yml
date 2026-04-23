@@ -43,10 +43,12 @@ jobs:
 
       - name: Check for old branding
         run: |
+          # Exclude legitimate third-party package paths that happen to use MUKE-coder
           if grep -r "MUKE-coder\|JB Web\|gritframework\|desishub" . \
                --exclude-dir=".git" \
                --include="*.go" --include="*.ts" --include="*.tsx" \
-               --include="*.md" --include="*.json"; then
+               --include="*.md" --include="*.json" | \
+             grep -v "MUKE-coder/sentinel\|MUKE-coder/pulse\|MUKE-coder/gorm-studio\|MUKE-coder/gin-docs"; then
             echo "ERROR: old branding strings found — remove them before merging"
             exit 1
           fi
