@@ -282,7 +282,7 @@ func (s *SMTP) Send(ctx context.Context, msg EmailMessage) (*EmailResponse, erro
 
 	writer.Close()
 
-	addr := fmt.Sprintf("%s:%d", s.host, s.port)
+	addr := net.JoinHostPort(s.host, fmt.Sprintf("%d", s.port))
 	auth := smtp.PlainAuth("", s.username, s.password, s.host)
 
 	var sendErr error

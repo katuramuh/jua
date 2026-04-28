@@ -598,7 +598,11 @@ func generateResourceCmd() *cobra.Command {
 					return err
 				}
 			default:
-				return fmt.Errorf("specify fields with --fields, --from, or use -i for interactive mode\n\nExamples:\n  jua generate resource Post --fields \"title:string,content:text,published:bool\"\n  jua generate resource Post --fields \"title:string,slug:string:unique,views:int\"\n  jua generate resource Post --from post.yaml\n  jua generate resource Post -i")
+				// Allow empty scaffold — no fields generates a minimal model
+				def, err = generate.ParseInlineFields(name, "")
+				if err != nil {
+					return err
+				}
 			}
 
 			// Detect project type and dispatch

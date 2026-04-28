@@ -107,7 +107,7 @@ func (a *App) Dispatch(ctx context.Context, params map[string]string) string {
 		// Jua events: session ended — fire for real-time dashboards and notifications
 		events.Publish(events.USSDSessionCompleted, "", map[string]interface{}{
 			"session_id":   req.SessionID,
-			"phone":        req.Phone,
+			"phone":        req.PhoneNumber,
 			"service_code": req.ServiceCode,
 		})
 	}
@@ -428,7 +428,7 @@ func ExampleBalanceFlow() *Flow {
 		Next: func(input string, session map[string]interface{}) string {
 			return "" // end session
 		},
-		Action: func(ctx interface{ Done() <-chan struct{} }, input string, session map[string]interface{}) error {
+		Action: func(ctx context.Context, input string, session map[string]interface{}) error {
 			// TODO: Look up actual balance from your database/service
 			session["__end_message"] = "Your balance is UGX 12,500. Thank you."
 			return nil

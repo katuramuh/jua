@@ -291,7 +291,7 @@ func TestUserHandler_List_AdminAccess(t *testing.T) {
 	r, authSvc, _ := newUserTestSetup(t)
 
 	// Fetch the admin we seeded — just generate a token directly
-	tokens, err := authSvc.GenerateTokenPair(1, "admin@example.com", models.RoleAdmin)
+	tokens, err := authSvc.GenerateTokenPair("1", "admin@example.com", models.RoleAdmin)
 	require.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/users", nil)
@@ -310,7 +310,7 @@ func TestUserHandler_List_AdminAccess(t *testing.T) {
 func TestUserHandler_GetByID_NotFound(t *testing.T) {
 	r, authSvc, _ := newUserTestSetup(t)
 
-	tokens, err := authSvc.GenerateTokenPair(1, "admin@example.com", models.RoleAdmin)
+	tokens, err := authSvc.GenerateTokenPair("1", "admin@example.com", models.RoleAdmin)
 	require.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/users/99999", nil)
@@ -324,7 +324,7 @@ func TestUserHandler_GetByID_NotFound(t *testing.T) {
 func TestUserHandler_GetByID_Success(t *testing.T) {
 	r, authSvc, _ := newUserTestSetup(t)
 
-	tokens, err := authSvc.GenerateTokenPair(1, "admin@example.com", models.RoleAdmin)
+	tokens, err := authSvc.GenerateTokenPair("1", "admin@example.com", models.RoleAdmin)
 	require.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "/api/users/1", nil)

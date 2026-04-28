@@ -174,10 +174,7 @@ func (s *Service) RequestOTP(ctx context.Context, phone, purpose string) error {
 	// Send OTP via SMS
 	msg := fmt.Sprintf("Your %s verification code is %s. Valid for %d minutes. Do not share this code.",
 		s.appName, code, OTPTTLMinutes)
-	if _, err := s.smsProvider.Send(ctx, sms.Message{
-		To:   phone,
-		Body: msg,
-	}); err != nil {
+	if err := s.smsProvider.Send(phone, msg); err != nil {
 		// Clean up the stored OTP if SMS fails
 		s.db.Delete(otp)
 		return fmt.Errorf("phone otp: send sms: %w", err)

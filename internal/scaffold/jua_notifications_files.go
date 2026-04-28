@@ -534,7 +534,12 @@ func (e *Engine) deliverChannel(ctx context.Context, record *NotificationRecord,
 			var emailAddr string
 			e.db.Raw("SELECT email FROM users WHERE id = ?", record.UserID).Scan(&emailAddr)
 			if emailAddr != "" {
-				deliveryErr = e.email.SendHTML(ctx, emailAddr, record.Title, record.Body, "<p>"+record.Body+"</p>")
+				_, deliveryErr = e.email.Send(ctx, email.EmailMessage{
+					To:      []string{emailAddr},
+					Subject: record.Title,
+					HTML:    "<p>" + record.Body + "</p>",
+					Text:    record.Body,
+				})
 			}
 		}
 	case ChannelPush:
@@ -542,7 +547,7 @@ func (e *Engine) deliverChannel(ctx context.Context, record *NotificationRecord,
 			var tokens []PushToken
 			e.db.Where("user_id = ? AND active = true", record.UserID).Find(&tokens)
 			for _, t := range tokens {
-				_ = e.push.Send(ctx, push.PushNotification{
+				_, _ = e.push.Send(ctx, push.PushNotification{
 					Token: t.Token,
 					Title: record.Title,
 					Body:  record.Body,

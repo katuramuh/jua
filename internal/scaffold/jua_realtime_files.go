@@ -1110,7 +1110,7 @@ func RealtimeAuthMiddleware(db *gorm.DB, authService *services.AuthService) gin.
 			return
 		}
 
-		c.Set("userID", fmt.Sprintf("%d", claims.UserID))
+		c.Set("userID", claims.UserID)
 		// tenantID is set by multitenancy middleware if active;
 		// for single-tenant apps it defaults to the empty string.
 		if c.GetString("tenantID") == "" {

@@ -55,7 +55,7 @@ func Init() (*Config, []error) {
 	var errs []error
 	cfg := &Config{}
 
-	if p, err := sms.Registry(); err != nil {
+	if p, err := sms.New(); err != nil {
 		errs = append(errs, err)
 	} else {
 		cfg.SMS = p

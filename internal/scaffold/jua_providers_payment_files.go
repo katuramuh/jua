@@ -60,6 +60,7 @@ type PaymentResponse struct {
 // RefundRequest holds parameters for a refund.
 type RefundRequest struct {
 	TransactionID string
+	Reference     string
 	Amount        float64
 	Reason        string
 }

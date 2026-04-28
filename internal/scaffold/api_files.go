@@ -54,9 +54,9 @@ func apiGoMod(opts Options) string {
 go 1.21
 
 require (
-	github.com/katuramuh/gin-docs v0.0.0-20260222113017-4d647cb4e7aa
-	github.com/katuramuh/gorm-studio v1.0.1
-	github.com/katuramuh/pulse v0.0.0-20260223005903-6f5d6e356231
+	github.com/MUKE-coder/gin-docs v0.0.0-20260222113017-4d647cb4e7aa
+	github.com/MUKE-coder/gorm-studio v1.0.1
+	github.com/MUKE-coder/pulse v0.0.0-20260223005903-6f5d6e356231
 	github.com/aws/aws-sdk-go-v2 v1.25.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.0
@@ -73,7 +73,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.4.0
 	golang.org/x/crypto v0.23.0
-	github.com/katuramuh/sentinel v0.0.0-20260220061042-2d2324be6824
+	github.com/MUKE-coder/sentinel v0.0.0-20260220061042-2d2324be6824
 	gorm.io/datatypes v1.2.7
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
@@ -641,6 +641,7 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // Role constants
@@ -749,6 +750,7 @@ func apiUploadModelGo() string {
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -814,7 +816,7 @@ type Claims struct {
 }
 
 // GenerateTokenPair creates a new access + refresh token pair.
-func (s *AuthService) GenerateTokenPair(userID uint, email, role string) (*TokenPair, error) {
+func (s *AuthService) GenerateTokenPair(userID string, email, role string) (*TokenPair, error) {
 	accessToken, expiresAt, err := s.generateToken(userID, email, role, s.AccessExpiry)
 	if err != nil {
 		return nil, fmt.Errorf("generating access token: %w", err)
@@ -862,7 +864,7 @@ func GenerateResetToken() (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-func (s *AuthService) generateToken(userID uint, email, role string, expiry time.Duration) (string, int64, error) {
+func (s *AuthService) generateToken(userID string, email, role string, expiry time.Duration) (string, int64, error) {
 	expiresAt := time.Now().Add(expiry)
 
 	claims := &Claims{
@@ -1069,7 +1071,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var totpConfig models.TwoFactorConfig
 	if err := h.DB.Where("user_id = ? AND enabled = ?", user.ID, true).First(&totpConfig).Error; err == nil {
 		// TOTP is enabled — check for trusted device
-		if !handlers.IsTrustedDevice(c, h.DB, user.ID) {
+		if !IsTrustedDevice(c, h.DB, user.ID) {
 			// Generate a short-lived pending token for TOTP verification
 			pendingToken, err := totp.GeneratePendingToken()
 			if err != nil {
@@ -1995,6 +1997,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net/http"
 	"strings"
 	"time"
 
@@ -2179,10 +2182,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/katuramuh/gin-docs/gindocs"
-	"github.com/katuramuh/gorm-studio/studio"
-	"github.com/katuramuh/pulse/pulse"
-	"github.com/katuramuh/sentinel"
+	"github.com/MUKE-coder/gin-docs/gindocs"
+	"github.com/MUKE-coder/gorm-studio/studio"
+	"github.com/MUKE-coder/pulse/pulse"
+	"github.com/MUKE-coder/sentinel"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 

@@ -97,7 +97,8 @@ type WebhookEvent struct {
 	UpdatedAt time.Time ` + "`" + `json:"updated_at"` + "`" + `
 
 	// WebhookID is the webhook this event was delivered to.
-	WebhookID uint ` + "`" + `gorm:"not null;index" json:"webhook_id"` + "`" + `
+	WebhookID uint    ` + "`" + `gorm:"not null;index" json:"webhook_id"` + "`" + `
+	Webhook   Webhook ` + "`" + `gorm:"foreignKey:WebhookID" json:"-"` + "`" + `
 
 	// EventName is the event type, e.g. "user.created".
 	EventName string ` + "`" + `gorm:"not null;index" json:"event_name"` + "`" + `
